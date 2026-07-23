@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: "false"
+}
+
+@theme {
+  --color-primary: #0040A1;
+  --color-secondary: #FAF8FF
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+button {
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  outline: 0;
+}
+
+.css-16wblaj-MuiInputBase-input-MuiOutlinedInput-input {
+  height: 10px !important;
+}
+
+.dark .css-16wblaj-MuiInputBase-input-MuiOutlinedInput-input {
+  background-color: #314158 !important;
+  color: white !important;
+}
+
+.css-1jaky35-MuiFormControl-root-MuiTextField-root input {
+  background-color: #F2F3FE !important;
+  border-radius: 5px !important;
+}
