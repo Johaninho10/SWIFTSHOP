@@ -17,7 +17,7 @@ const generateOTP = () => {
   return `${Math.floor(Math.random() * 900000 + 100000)}`;
 };
 
-// Sign Up Controller
+// Sign Up 
 export const signUp = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { firstname, lastname, email, password }: Inputs = req.body;
@@ -151,7 +151,7 @@ export const signUp = asyncHandler(
   },
 );
 
-// Send Verification OTP Controller
+// Send Verification OTP
 export const sendVerificationOTP = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { OTPToken } = req.cookies;
@@ -205,7 +205,7 @@ export const sendVerificationOTP = asyncHandler(
   },
 );
 
-// Verify Email Controller
+// Verify Email
 export const verifyEmail = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { OTPToken } = req.cookies;
@@ -270,7 +270,7 @@ export const verifyEmail = asyncHandler(
   },
 );
 
-// Sign In Controller
+// Sign In 
 export const signIn = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password }: { email: string; password: string } = req.body;
@@ -322,7 +322,7 @@ export const signIn = asyncHandler(
   },
 );
 
-// Sign Out Controller
+// Sign Out
 export const signOut = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     console.log("Hey");
