@@ -45,18 +45,38 @@ model Category {
   name          String        @unique
   image         String
   subCategories SubCategory[]
+  productsIDs   String[]      @db.ObjectId
+  products      Product[]     @relation(fields: [productsIDs], references: [id])
   isPopular     Boolean       @default(false)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @default(now()) @updatedAt
 }
 
 model SubCategory {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  name       String   @unique
-  categoryId String   @db.ObjectId
-  category   Category @relation(fields: [categoryId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String    @unique
+  categoryId  String    @db.ObjectId
+  category    Category  @relation(fields: [categoryId], references: [id])
+  productsIDs String[]  @db.ObjectId
+  products    Product[] @relation(fields: [productsIDs], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+
+  @@unique([name, categoryId])
+}
+
+model Product {
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  title            String
+  price            Int
+  brand            String
+  images           String[]
+  categoriesIDs    String[]      @db.ObjectId
+  categories       Category[]    @relation(fields: [categoriesIDs], references: [id])
+  subCategoriesIDs String[]      @db.ObjectId
+  subCategories    SubCategory[] @relation(fields: [subCategoriesIDs], references: [id])
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @default(now()) @updatedAt
 }
 
 enum Role {

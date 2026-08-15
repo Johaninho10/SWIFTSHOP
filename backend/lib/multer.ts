@@ -8,23 +8,15 @@ const storage = multer.diskStorage({
   },
 });
 
-const allowedMimeTypes = [
-  "image/jpeg",
-  "image/png",
-  "image/jpg",
-  "image/gif",
-  "image/webp",
-];
-
 const fileFilter = (
   req: Request,
   file: Express.Multer.File,
   cb: FileFilterCallback,
 ) => {
-  if (allowedMimeTypes.includes(file.mimetype)) {
+  if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
-    cb(new Error("SOnly images are authorized."));
+    cb(new Error("Only images are authorized."));
   }
 };
 

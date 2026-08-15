@@ -79,7 +79,7 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center space-x-3">
-          <button className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all">
+          <button className="sm:hidden w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all">
             <Search className="" />
           </button>
           {user && (
@@ -91,7 +91,7 @@ const Navbar = () => {
           <button className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all relative">
             <ShoppingCart className="" />
             <div className="absolute bg-red-500 w-5 h-5 flex justify-center items-center rounded-full -top-1 -right-1 text-white">
-              3
+              0
             </div>
           </button>
 
@@ -101,12 +101,14 @@ const Navbar = () => {
           >
             {theme === "dark" ? <Moon /> : <Sun />}
           </button>
-          <button
-            className="sm:hidden w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all"
-            onClick={() => setShowSidebar(true)}
-          >
-            <Menu className="" />
-          </button>
+          {user && (
+            <button
+              className="sm:hidden w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all"
+              onClick={() => setShowSidebar(true)}
+            >
+              <Menu className="" />
+            </button>
+          )}
           {user ? (
             <div className="dropdown dropdown-start hidden sm:flex relative">
               <div
@@ -118,7 +120,7 @@ const Navbar = () => {
               </div>
               <ul
                 tabIndex={-1}
-                className="dropdown-content menu bg-white dark:bg-gray-800 rounded-md z-1 py-4 w-52 shadow-[0px_0px_10px_rgba(0,0,0,0.2)] absolute top-full right-1/2"
+                className="dropdown-content menu bg-white dark:bg-gray-800 rounded-md py-4 w-52 shadow-[0px_0px_10px_rgba(0,0,0,0.2)] absolute top-full right-1/2 z-2"
               >
                 <li className="hover:bg-slate-200/60 dark:hover:bg-gray-600 rounded-md text-[16px] py-1">
                   <a className="text-slate-700 dark:text-gray-200 font-medium flex space-x-2 items-center">

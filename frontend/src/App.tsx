@@ -1,33 +1,33 @@
 import { useEffect } from "react";
-import { useSelector, useDispatch} from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Outlet, useLocation } from "react-router-dom";
 import { useGetUserQuery } from "./app/services/user";
 import { setUser } from "./app/features/user";
-import {motion, scale} from "motion/react"
+import { motion } from "motion/react";
 
 type UI = {
-  theme: string
-}
+  theme: string;
+};
 
 type State = {
-  ui: UI
-}
+  ui: UI;
+};
 
 const App = () => {
   const theme = useSelector((state: State) => state.ui.theme);
   const { pathname } = useLocation();
 
-  const {data, isLoading} = useGetUserQuery(null)
-  const dispatch = useDispatch()
+  const { data, isLoading } = useGetUserQuery(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if(data){
-        if(data.success) {
-        dispatch(setUser(data.user))
-        localStorage.setItem("user", JSON.stringify(data.user))
+    if (data) {
+      if (data.success) {
+        dispatch(setUser(data.user));
+        localStorage.setItem("user", JSON.stringify(data.user));
       }
     }
-  }, [data])
+  }, [data]);
 
   useEffect(() => {
     window.scrollTo({
@@ -42,12 +42,18 @@ const App = () => {
       document.documentElement.classList.add("dark");
     }
   }, [theme]);
-  return (
-    isLoading ? <div className="w-screen h-screen flex justify-center items-center bg-secondary dark:bg-gray-800">
-      <motion.img src={theme === "dark" ? "/logo-white.png" : "/logo.png"} alt="logo" className="w-25"
-      animate={{scale: [1, 1.1, 1]}}
-      transition={{duration: 1, repeat: Infinity}}/>
-    </div> : <div className="overflow-x-hidden overflow-y-auto min-h-screen">
+  return isLoading ? (
+    <div className="w-screen h-screen flex justify-center items-center bg-secondary dark:bg-gray-800">
+      <motion.img
+        src={theme === "dark" ? "/logo-white.png" : "/logo.png"}
+        alt="logo"
+        className="w-25"
+        animate={{ scale: [1, 1.1, 1] }}
+        transition={{ duration: 1, repeat: Infinity }}
+      />
+    </div>
+  ) : (
+    <div className="overflow-x-hidden overflow-y-auto min-h-screen">
       <Outlet />
     </div>
   );

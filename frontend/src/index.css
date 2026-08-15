@@ -6,7 +6,7 @@
 
 @theme {
   --color-primary: #0040A1;
-  --color-secondary: #FAF8FF
+  --color-secondary: #FFFFFF
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -33,4 +33,32 @@ select {
 .css-1jaky35-MuiFormControl-root-MuiTextField-root input {
   background-color: #F2F3FE !important;
   border-radius: 5px !important;
+}
+
+.swiper{
+  position: relative !important;
+}
+
+.swiper-button-next, .swiper-button-prev{
+  background-color: #0040A1;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50%;
+}
+.swiper-button-prev{
+  position: absolute !important;
+  top: 50% !important;
+  left: 15px !important;
+}
+
+.swiper-button-next{
+  position: absolute !important;
+  top: 50% !important;
+  right: 15px !important;
+}
+
+.swiper-navigation-icon{
+  height: 20px !important;
+  width:  10px !important;
+  color: white;
 }

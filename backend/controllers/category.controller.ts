@@ -90,7 +90,7 @@ export const createCategory = asyncHandler(
       folder: "categories",
     });
 
-    await prisma.category.create({
+    const category = await prisma.category.create({
       data: {
         name,
         image: result.secure_url,
@@ -100,6 +100,7 @@ export const createCategory = asyncHandler(
     res.status(201).json({
       success: true,
       message: "Category created successfully!",
+      category,
     });
   },
 );
