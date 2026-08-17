@@ -1,5 +1,6 @@
 import Hero from "../components/Hero";
 import Navbar from "../components/Navbar";
+import NewArrivals from "../components/NewArrivals";
 import PopularCategories from "../components/PopularCategories";
 
 const Home = () => {
@@ -8,6 +9,7 @@ const Home = () => {
       <Navbar />
       <Hero />
       <PopularCategories />
+      <NewArrivals />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import userSlice from "./features/user";
 import authApi from "./services/auth";
 import userApi from "./services/user";
 import categoriesApi from "./services/categories";
+import productsApi from "./services/products";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
 const store = configureStore({
@@ -12,6 +13,7 @@ const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [categoriesApi.reducerPath]: categoriesApi.reducer,
+    [productsApi.reducerPath]: productsApi.reducer,
     user: userSlice,
   },
   middleware: (currentMiddleware) =>
@@ -19,6 +21,7 @@ const store = configureStore({
       authApi.middleware,
       userApi.middleware,
       categoriesApi.middleware,
+      productsApi.middleware
     ),
 });
 

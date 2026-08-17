@@ -7,8 +7,7 @@ import { Autoplay, Navigation } from "swiper/modules";
 import { useRef } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { motion } from "motion/react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 type Category = {
   id: string;
@@ -20,10 +19,9 @@ const PopularCategories = () => {
   const { data, isLoading } = useGetPopularCategoriesQuery(null);
   const prevEl = useRef<HTMLButtonElement>(null);
   const nextEl = useRef<HTMLButtonElement>(null);
-  const navigate = useNavigate();
 
   return (
-    <div className="px-5 md:px-[5%] lg:px-[10%] bg-secondary dark:bg-gray-800">
+    <div className="px-5 md:px-[5%] lg:px-[10%] dark:bg-gray-800">
       <h1 className="text-2xl font-medium text-slate-700 dark:text-gray-200">
         Popular Categories
       </h1>
@@ -78,6 +76,7 @@ const PopularCategories = () => {
                 <SwiperSlide key={index}>
                   <Skeleton
                     variant="rectangular"
+                    animation="wave"
                     className="w-full! h-50! rounded-2xl!"
                   />
                 </SwiperSlide>
@@ -85,12 +84,7 @@ const PopularCategories = () => {
             : data &&
               data.categories &&
               data.categories.map((category: Category) => (
-                <motion.div
-                  key={category.id}
-                  initial={{ y: 20, opacity: 0 }}
-                  whileInView={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 1, ease: "easeInOut" }}
-                >
+                <div>
                   <SwiperSlide className="rounded-2xl overflow-hidden">
                     <Link
                       to={`/search?category=${category.id}`}
@@ -108,7 +102,7 @@ const PopularCategories = () => {
                       </div>
                     </Link>
                   </SwiperSlide>
-                </motion.div>
+                </div>
               ))}
         </Swiper>
       }

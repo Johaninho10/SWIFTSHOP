@@ -23,8 +23,15 @@ type UI = {
   theme: string;
 };
 
+type User = {
+  user: {
+    firstname: string;
+  };
+};
+
 type State = {
   ui: UI;
+  user: User;
 };
 
 const Navbar = () => {
@@ -82,11 +89,13 @@ const Navbar = () => {
           <button className="sm:hidden w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all">
             <Search className="" />
           </button>
-          {user && (
-            <button className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all">
-              <Heart className="" />
-            </button>
-          )}
+
+          <button
+            className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all"
+            onClick={() => navigate("/wishlist")}
+          >
+            <Heart className="" />
+          </button>
 
           <button className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all relative">
             <ShoppingCart className="" />

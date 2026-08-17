@@ -37,6 +37,12 @@ const Hero = () => {
           pagination={{
             clickable: true,
           }}
+            onBeforeInit={(swiper) => {
+            if (typeof swiper.params.navigation !== "boolean") {
+              swiper.params.navigation.prevEl = prevEl.current;
+              swiper.params.navigation.nextEl = nextEl.current;
+            }
+          }}
           navigation={{
             prevEl: prevEl.current,
             nextEl: nextEl.current,

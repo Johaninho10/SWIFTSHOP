@@ -25,6 +25,8 @@ const App = () => {
       if (data.success) {
         dispatch(setUser(data.user));
         localStorage.setItem("user", JSON.stringify(data.user));
+      } else {
+        dispatch(setUser(false));
       }
     }
   }, [data]);

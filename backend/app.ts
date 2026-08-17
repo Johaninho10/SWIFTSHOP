@@ -8,6 +8,7 @@ import userRouter from "./routes/user.routes";
 import categoryRouter from "./routes/category.routes";
 import subCategoryRouter from "./routes/subcategory.routes";
 import bannerRouter from "./routes/banner.routes";
+import productRouter from "./routes/product.routes";
 
 // Creating express server
 const app = express();
@@ -29,6 +30,7 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/category", categoryRouter);
 app.use("/api/v1/subcategory", subCategoryRouter);
 app.use("/api/v1/banner", bannerRouter);
+app.use("/api/v1/product", productRouter)
 
 // Error Middleware
 app.use(errorMiddleware);
