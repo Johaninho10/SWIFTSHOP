@@ -42,6 +42,26 @@ const NewArrivals = () => {
           data.products.map((product) => (
             <ProductCard key={product.id} {...product} />
           ))}
+        {data &&
+          data.success &&
+          data.products.map((product) => (
+            <ProductCard key={product.id} {...product} />
+          ))}
+        {data &&
+          data.success &&
+          data.products.map((product) => (
+            <ProductCard key={product.id} {...product} />
+          ))}
+        {data &&
+          data.success &&
+          data.products.map((product) => (
+            <ProductCard key={product.id} {...product} />
+          ))}
+        {data &&
+          data.success &&
+          data.products.map((product) => (
+            <ProductCard key={product.id} {...product} />
+          ))}
       </div>
     </div>
   );

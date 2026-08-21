@@ -3,9 +3,15 @@ import BasicRating from "./BasicRating";
 import { useState } from "react";
 import { ShoppingCart, Heart } from "lucide-react";
 import { useToggleWishMutation } from "../app/services/products";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { motion } from "motion/react";
+import {
+  useAddToCartMutation,
+  useUpdateCartMutation,
+} from "../app/services/cart";
+import { Loader } from "lucide-react";
+import { setCart } from "../app/features/cart";
 
 type Image = {
   url: string;
@@ -25,20 +31,36 @@ type User = {
   user: {};
 };
 
+type CartItems = {
+  product: Product;
+  quantity: number;
+};
+
+type Cart = {
+  cart: CartItems[];
+};
+
 type Store = {
   user: User;
+  cart: Cart;
 };
 
 const ProductCard = (product: Product) => {
   const [quantity, setQuantity] = useState<number>(1);
   const [saved, setSaved] = useState<boolean>(product.saved);
 
+  const [addToCart, { isLoading: addToCartLoading }] = useAddToCartMutation();
+  const [updateCart, { isLoading: updateCartLoading }] =
+    useUpdateCartMutation();
+
   const [toggleWish, { isLoading }] = useToggleWishMutation();
 
   const user = useSelector((store: Store) => store.user.user);
+  const cart = useSelector((store: Store) => store.cart.cart);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleToggle = async () => {
+  const handleToggleWish = async () => {
     try {
       if (!user) {
         return navigate("/signin");
@@ -55,6 +77,50 @@ const ProductCard = (product: Product) => {
     }
   };
 
+  const handleAddToCart = async () => {
+    try {
+      const cartItem = cart.find((item) => item.product.id === product.id);
+
+      if (!cartItem) {
+        const result = await addToCart({
+          productId: product.id,
+          quantity,
+        }).unwrap();
+
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+        dispatch(setCart([...cart, result.cartItem]));
+      } else {
+        const result = await updateCart({
+          productId: product.id,
+          quantity: quantity + cartItem.quantity,
+        }).unwrap();
+
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+
+        let cartCopy = [...cart];
+
+        cartCopy = cartCopy.map((item) => {
+          if (item.product.id === cartItem.product.id) {
+            return { ...item, quantity: quantity + item.quantity };
+          }
+          return item;
+        });
+
+        dispatch(setCart(cartCopy));
+      }
+
+      toast.success("Added to Cart");
+    } catch (error) {
+      console.log(error);
+
+      toast.error("Something went wrong");
+    }
+  };
+
   return (
     <motion.div
       initial={{ y: 20, opacity: 0 }}
@@ -66,17 +132,17 @@ const ProductCard = (product: Product) => {
           <img
             src={product.images[0].url}
             alt="product"
-            className="w-full object-cover group-hover:scale-110 transition-all duration-300"
+            className="w-full h-full object-cover group-hover:scale-110 transition-all duration-300"
           />
         </Link>
         <button
           disabled={isLoading}
           className="w-11 h-11 rounded-full bg-white flex justify-center items-center absolute right-2 top-2"
-          onClick={handleToggle}
+          onClick={handleToggleWish}
         >
           {isLoading ? (
             <div className="w-5 h-5 rounded-full border border-primary border-b-transparent animate-spin"></div>
-          ) : saved ? (
+          ) : user && saved ? (
             <Heart className="text-red-500" fill="currentColor" />
           ) : (
             <Heart />
@@ -119,9 +185,19 @@ const ProductCard = (product: Product) => {
           </div>
           <div className=""></div>
         </div>
-        <button className="bg-primary dark:bg-white text-white dark:text-primary font-medium py-2 rounded-md flex justify-center items-center space-x-2 w-full mx-auto mt-2 group">
-          <span>Add to Cart</span>
-          <ShoppingCart className="group-hover:scale-115 transition-all duration-300" />
+        <button
+          disabled={addToCartLoading || updateCartLoading}
+          className={`bg-primary dark:bg-white dark:text-primary text-white py-2 rounded-lg flex justify-center items-center mt-2 font-medium`}
+          onClick={handleAddToCart}
+        >
+          {addToCartLoading || updateCartLoading ? (
+            <Loader className="animate-spin" />
+          ) : (
+            <div className="flex items-center space-x-2">
+              <span>Add to Cart</span>
+              <ShoppingCart className="group-hover:scale-115 transition-all duration-300" />
+            </div>
+          )}
         </button>
       </div>
     </motion.div>

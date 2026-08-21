@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { toast } from "react-toastify";
 import { useSignInMutation } from "../app/services/auth";
 import { setUser } from "../app/features/user";
+import { setCart } from "../app/features/cart";
 
 type Inputs = {
   email: string;
@@ -38,6 +39,7 @@ const SignIn = () => {
       if (result.success) {
         localStorage.setItem("user", JSON.stringify(result.user));
         dispatch(setUser(result.user));
+        dispatch(setCart(result.cart));
         toast.success(result.message);
         navigate("/");
       } else {

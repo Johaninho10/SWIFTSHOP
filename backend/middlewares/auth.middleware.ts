@@ -21,13 +21,6 @@ const authMiddleware = asyncHandler(
       where: {
         id: userId,
       },
-      select: {
-        id: true,
-        firstname: true,
-        lastname: true,
-        email: true,
-        role: true,
-      },
     });
 
     if (!user) {

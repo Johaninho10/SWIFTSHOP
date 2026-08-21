@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import productsApi from "./products";
 
 const baseUrl = import.meta.env.VITE_BASE_URL + "/auth";
 
@@ -20,6 +21,13 @@ const authApi = createApi({
         method: "POST",
         body,
       }),
+
+      onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+          dispatch(productsApi.util.invalidateTags(["NewArrivals"]));
+        } catch (error) {}
+      },
     }),
 
     verifyEmail: build.mutation({
@@ -42,6 +50,12 @@ const authApi = createApi({
         url: "/signout",
         method: "POST",
       }),
+      onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+          dispatch(productsApi.util.invalidateTags(["NewArrivals"]));
+        } catch (error) {}
+      },
     }),
   }),
 });

@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Outlet, useLocation } from "react-router-dom";
-import { useGetUserQuery } from "./app/services/user";
+import { useGetCartQuery, useGetUserQuery } from "./app/services/user";
 import { setUser } from "./app/features/user";
 import { motion } from "motion/react";
+import { setCart } from "./app/features/cart";
 
 type UI = {
   theme: string;
@@ -18,18 +19,28 @@ const App = () => {
   const { pathname } = useLocation();
 
   const { data, isLoading } = useGetUserQuery(null);
+
+  const { data: cartData } = useGetCartQuery(null);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (data) {
       if (data.success) {
         dispatch(setUser(data.user));
-        localStorage.setItem("user", JSON.stringify(data.user));
       } else {
         dispatch(setUser(false));
       }
     }
   }, [data]);
+
+  useEffect(() => {
+    if (cartData) {
+      if (cartData.success) {
+        dispatch(setCart(cartData.cart));
+      }
+    }
+  }, [cartData]);
 
   useEffect(() => {
     window.scrollTo({

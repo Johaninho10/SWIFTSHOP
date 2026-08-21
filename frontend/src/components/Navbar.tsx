@@ -6,7 +6,6 @@ import {
   Sun,
   Menu,
   Moon,
-  LogIn,
   User,
   RotateCcwIcon,
   LogOut,
@@ -18,6 +17,7 @@ import { useSignOutMutation } from "../app/services/auth";
 import { toast } from "react-toastify";
 import { setUser } from "../app/features/user";
 import { useState } from "react";
+import { setCart } from "../app/features/cart";
 
 type UI = {
   theme: string;
@@ -29,14 +29,41 @@ type User = {
   };
 };
 
+type Image = {
+  url: string;
+};
+
+type Product = {
+  id: string;
+  title: string;
+  brand: string;
+  description: string;
+  price: number;
+  saved: boolean;
+  images: Image[];
+};
+
+type CartItem = {
+  product: Product;
+  quantity: number;
+};
+
+type Cart = {
+  cart: CartItem[];
+};
+
 type State = {
   ui: UI;
   user: User;
+  cart: Cart;
 };
 
 const Navbar = () => {
   const theme = useSelector((state: State) => state?.ui?.theme);
   const user = useSelector((state: State) => state?.user?.user);
+  const cart = useSelector((state: State) => state.cart.cart);
+  const cartQuantity =
+    cart.length === 0 ? 0 : cart.reduce((acc, item) => acc + item.quantity, 0);
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
 
   const dispatch = useDispatch();
@@ -51,6 +78,7 @@ const Navbar = () => {
         toast.success(result.message);
         localStorage.removeItem("user");
         dispatch(setUser(null));
+        dispatch(setCart([]));
         if (showSidebar) {
           setShowSidebar(false);
         }
@@ -97,10 +125,13 @@ const Navbar = () => {
             <Heart className="" />
           </button>
 
-          <button className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all relative">
+          <button
+            className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all relative"
+            onClick={() => navigate("/cart")}
+          >
             <ShoppingCart className="" />
-            <div className="absolute bg-red-500 w-5 h-5 flex justify-center items-center rounded-full -top-1 -right-1 text-white">
-              0
+            <div className="absolute bg-red-500 w-6 h-6 flex justify-center items-center rounded-full -top-1 -right-1 text-white text-xs">
+              {cartQuantity}
             </div>
           </button>
 
@@ -156,11 +187,10 @@ const Navbar = () => {
             </div>
           ) : (
             <button
-              className="bg-primary dark:bg-white  rounded-lg py-2 px-2 flex justify-center items-center space-x-2 text-white dark:text-primary  transition-all"
+              className="bg-primary dark:bg-white  rounded-lg py-3 px-4 flex justify-center items-center space-x-2 text-white dark:text-primary  transition-all"
               onClick={() => navigate("/signin")}
             >
-              <span className="">Sign In</span>
-              <LogIn className="" />
+              <span className="text-sm">Sign In</span>
             </button>
           )}
         </div>

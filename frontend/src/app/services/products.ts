@@ -6,10 +6,11 @@ const baseUrl = import.meta.env.VITE_BASE_URL + "/product";
 const productsApi = createApi({
   reducerPath: "productsApi",
   baseQuery: fetchBaseQuery({ baseUrl, credentials: "include" }),
+  tagTypes: ["NewArrivals"],
   endpoints: (build) => ({
     getNewArrivals: build.query({
       query: () => "/new-arrivals",
-      keepUnusedDataFor: 0
+      providesTags: ["NewArrivals"],
     }),
     toggleWish: build.mutation({
       query: (body) => ({
@@ -17,6 +18,7 @@ const productsApi = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: ["NewArrivals"],
       onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
         try {
           await queryFulfilled;

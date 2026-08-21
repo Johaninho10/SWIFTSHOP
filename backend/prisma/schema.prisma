@@ -39,6 +39,8 @@ model User {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @default(now()) @updatedAt
   wishes            Wish[]
+  cart              Cart?
+  cartId            String?  @db.ObjectId
 }
 
 model Category {
@@ -81,6 +83,7 @@ model Product {
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @default(now()) @updatedAt
   wishes           Wish[]
+  cartItems        CartItems[]
 }
 
 model Image {
@@ -100,6 +103,28 @@ model Wish {
   updatedAt DateTime @default(now()) @updatedAt
 
   @@unique([userId, productId])
+}
+
+model Cart {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String?     @unique
+  user      User?       @relation(fields: [userId], references: [id])
+  cartItems CartItems[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @default(now()) @updatedAt
+}
+
+model CartItems {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  cartId    String   @db.ObjectId
+  productId String   @db.ObjectId
+  quantity  Int
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([cartId, productId])
 }
 
 enum Role {

@@ -17,7 +17,7 @@ const generateOTP = () => {
   return `${Math.floor(Math.random() * 900000 + 100000)}`;
 };
 
-// Sign Up 
+// Sign Up
 export const signUp = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { firstname, lastname, email, password }: Inputs = req.body;
@@ -100,6 +100,8 @@ export const signUp = asyncHandler(
           success: true,
           message: "Verification code sent!",
         });
+
+      return;
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -270,7 +272,7 @@ export const verifyEmail = asyncHandler(
   },
 );
 
-// Sign In 
+// Sign In
 export const signIn = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password }: { email: string; password: string } = req.body;
@@ -278,13 +280,6 @@ export const signIn = asyncHandler(
     const user = await prisma.user.findUnique({
       where: {
         email,
-      },
-      select: {
-        id: true,
-        firstname: true,
-        lastname: true,
-        email: true,
-        password: true,
       },
     });
 
@@ -306,6 +301,132 @@ export const signIn = asyncHandler(
 
     const { password: pass, ...userWithoutPassword } = user;
 
+    const { cartToken } = req.cookies;
+    let cart: any = [];
+
+    if (cartToken) {
+      const { cartId } = jwt.verify(
+        cartToken,
+        String(process.env.JWT_SECRET_KEY),
+      );
+      if (!user.cartId) {
+        await prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            cartId,
+          },
+        });
+      } else {
+        const cartItems = await prisma.cartItems.findMany({
+          where: {
+            cartId: user.cartId,
+          },
+        });
+
+        const addedCartItems = await prisma.cartItems.findMany({
+          where: {
+            cartId,
+          },
+        });
+
+        const productsIDs = cartItems.map((item) => item.productId);
+
+        addedCartItems.forEach(async (item) => {
+          if (productsIDs.includes(item.productId)) {
+            const current = cartItems.find(
+              (cartItem) => cartItem.productId === item.productId,
+            );
+            await prisma.cartItems.update({
+              where: {
+                cartId_productId: {
+                  cartId: String(user.cartId),
+                  productId: item.productId,
+                },
+              },
+              data: {
+                quantity: Number(current?.quantity) + item.quantity,
+              },
+            });
+          } else {
+            await prisma.cartItems.update({
+              where: {
+                cartId_productId: {
+                  cartId,
+                  productId: item.productId,
+                },
+              },
+              data: {
+                cartId: String(user.cartId),
+              },
+            });
+          }
+        });
+        await prisma.cartItems.deleteMany({
+          where: {
+            cartId,
+          },
+        });
+
+        await prisma.cart.delete({
+          where: {
+            id: cartId,
+          },
+        });
+      }
+
+      cart = (
+        await prisma.cart.findUnique({
+          where: {
+            id: user.cartId ? user.cartId : cartId,
+          },
+          select: {
+            cartItems: {
+              select: {
+                product: {
+                  include: {
+                    images: {
+                      select: {
+                        url: true,
+                      },
+                    },
+                  },
+                },
+                quantity: true,
+              },
+            },
+          },
+        })
+      )?.cartItems;
+    } else {
+      if (user.cartId) {
+        cart = (
+          await prisma.cart.findUnique({
+            where: {
+              id: user.cartId,
+            },
+            select: {
+              cartItems: {
+                select: {
+                  product: {
+                    include: {
+                      images: {
+                        select: {
+                          url: true,
+                        },
+                      },
+                    },
+                  },
+                  quantity: true,
+                },
+              },
+            },
+          })
+        )?.cartItems;
+      }
+    }
+
     res
       .status(200)
       .cookie("token", token, {
@@ -314,10 +435,16 @@ export const signIn = asyncHandler(
         secure: process.env.NODE_ENV === "PRODUCTION",
         sameSite: process.env.NODE_ENV === "PRODUCTION" ? "none" : "lax",
       })
+      .clearCookie("cartToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "PRODUCTION",
+        sameSite: process.env.NODE_ENV === "PRODUCTION" ? "none" : "lax",
+      })
       .json({
         success: true,
         message: "Signed In successfully!",
         user: userWithoutPassword,
+        cart,
       });
   },
 );
@@ -325,8 +452,6 @@ export const signIn = asyncHandler(
 // Sign Out
 export const signOut = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log("Hey");
-
     res
       .status(200)
       .clearCookie("token", {

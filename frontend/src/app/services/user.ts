@@ -6,16 +6,20 @@ const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: fetchBaseQuery({ baseUrl: baseUrl, credentials: "include" }),
   tagTypes: ["Wishlist"],
-  endpoints: (builder) => ({
-    getUser: builder.query({
+  endpoints: (build) => ({
+    getUser: build.query({
       query: () => "/",
     }),
-    getWishlist: builder.query({
+    getWishlist: build.query({
       query: () => "/wishlist",
       providesTags: ["Wishlist"],
+    }),
+    getCart: build.query({
+      query: () => "/cart",
     }),
   }),
 });
 
-export const { useGetUserQuery, useGetWishlistQuery } = userApi;
+export const { useGetUserQuery, useGetWishlistQuery, useGetCartQuery } =
+  userApi;
 export default userApi;
