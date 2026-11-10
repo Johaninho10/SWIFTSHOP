@@ -1,11 +1,28 @@
 import type { Request, Response, NextFunction } from "express";
 import asyncHander from "express-async-handler";
 import prisma from "../lib/prisma";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { User } from "../generated/prisma/client";
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+    }
+  }
+}
+
+interface AuthPayload extends JwtPayload {
+  userId: string;
+}
+
+interface CartPayload extends JwtPayload {
+  cartId: string;
+}
 
 export const addToCart = asyncHander(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { productId, quantity } = req.body;
+    const { productId, quantity, color } = req.body;
 
     if (!quantity) {
       throw new Error("The quantity is required!");
@@ -19,6 +36,14 @@ export const addToCart = asyncHander(
       throw new Error("The quantity must be an integer");
     }
 
+    if (!productId) {
+      throw new Error("The product id is required");
+    }
+
+    if (!color?.trim()) {
+      throw new Error("The color is required");
+    }
+
     const product = await prisma.product.findUnique({
       where: {
         id: productId,
@@ -28,11 +53,15 @@ export const addToCart = asyncHander(
     if (!product) {
       throw new Error("Product not found");
     }
+    
 
     const { token } = req.cookies;
     let user;
     if (token) {
-      const { userId } = jwt.verify(token, String(process.env.JWT_SECRET_KEY));
+      const { userId } = jwt.verify(
+        token,
+        String(process.env.JWT_SECRET_KEY),
+      ) as AuthPayload;
       user = await prisma.user.findUnique({
         where: {
           id: userId,
@@ -46,9 +75,7 @@ export const addToCart = asyncHander(
         cartId = user.cartId;
       } else {
         const cart = await prisma.cart.create({
-          data: {
-            userId: user.id,
-          },
+          data: {},
         });
 
         await prisma.user.update({
@@ -61,12 +88,30 @@ export const addToCart = asyncHander(
         });
         cartId = cart.id;
       }
-      const cartItem = await prisma.cartItems.create({
-        data: {
-          cartId,
-          productId,
-          quantity: Number(Number(quantity).toFixed(0)),
+
+      const data: any = {
+        cartId,
+        productId,
+        quantity: Number(Number(quantity).toFixed(0)),
+        color: color.trim(),
+      };
+
+      const existingCartItem = await prisma.cartItems.findUnique({
+        where: {
+          cartId_productId_color: {
+            cartId,
+            productId,
+            color: color.trim(),
+          },
         },
+      });
+
+      if (existingCartItem) {
+        throw new Error("Cart Item already existing");
+      }
+
+      const cartItem = await prisma.cartItems.create({
+        data,
         include: {
           product: {
             include: {
@@ -92,7 +137,10 @@ export const addToCart = asyncHander(
     const { cartToken } = req.cookies;
     let cartId;
     if (cartToken) {
-      ({ cartId } = jwt.verify(cartToken, String(process.env.JWT_SECRET_KEY)));
+      ({ cartId } = jwt.verify(
+        cartToken,
+        String(process.env.JWT_SECRET_KEY),
+      ) as CartPayload);
       if (cartId) {
         const cart = await prisma.cart.findUnique({
           where: {
@@ -116,6 +164,7 @@ export const addToCart = asyncHander(
         cartId,
         productId,
         quantity,
+        color,
       },
       select: {
         product: {
@@ -128,6 +177,7 @@ export const addToCart = asyncHander(
           },
         },
         quantity: true,
+        color: true
       },
     });
 
@@ -156,8 +206,8 @@ export const addToCart = asyncHander(
 export const updateCart = asyncHander(
   async (req: Request, res: Response, next: NextFunction) => {
     const { token } = req.cookies;
-    const { productId, quantity } = req.body;
-    let user;
+    const { productId, quantity, color } = req.body;
+    let user;    
 
     if (isNaN(quantity)) {
       throw new Error("The quantity must be a number");
@@ -171,6 +221,14 @@ export const updateCart = asyncHander(
       throw new Error("The quantity must be a positive number");
     }
 
+    if (!productId) {
+      throw new Error("The product id is required");
+    }
+
+    if (!color?.trim()) {
+      throw new Error("The color is required");
+    }
+
     const product = await prisma.product.findUnique({
       where: {
         id: productId,
@@ -182,7 +240,10 @@ export const updateCart = asyncHander(
     }
 
     if (token) {
-      const { userId } = jwt.verify(token, String(process.env.JWT_SECRET_KEY));
+      const { userId } = jwt.verify(
+        token,
+        String(process.env.JWT_SECRET_KEY),
+      ) as AuthPayload;
       user = await prisma.user.findUnique({
         where: {
           id: userId,
@@ -202,7 +263,10 @@ export const updateCart = asyncHander(
       if (!cartToken) {
         throw new Error("Cart token is missing");
       }
-      ({ cartId } = jwt.verify(cartToken, String(process.env.JWT_SECRET_KEY)));
+      ({ cartId } = jwt.verify(
+        cartToken,
+        String(process.env.JWT_SECRET_KEY),
+      ) as CartPayload);
 
       const cart = await prisma.cart.findUnique({
         where: {
@@ -217,13 +281,24 @@ export const updateCart = asyncHander(
 
     let cartItem;
 
+    cartItem = await prisma.cartItems.findUnique({
+      where: {
+        cartId_productId_color: {
+          cartId,
+          productId,
+          color: color.trim(),
+        },
+      },
+    });
+
+    if (!cartItem) {
+      throw new Error("Cart item not found, add the product to the cart");
+    }
+
     if (quantity !== 0) {
       cartItem = await prisma.cartItems.update({
         where: {
-          cartId_productId: {
-            cartId,
-            productId,
-          },
+          id: cartItem.id,
         },
         data: {
           quantity,
@@ -232,10 +307,7 @@ export const updateCart = asyncHander(
     } else {
       await prisma.cartItems.delete({
         where: {
-          cartId_productId: {
-            cartId,
-            productId,
-          },
+          id: cartItem.id,
         },
       });
     }

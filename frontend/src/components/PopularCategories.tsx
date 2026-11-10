@@ -9,6 +9,8 @@ import Skeleton from "@mui/material/Skeleton";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
+
+
 type Category = {
   id: string;
   image: string;
@@ -84,25 +86,26 @@ const PopularCategories = () => {
             : data &&
               data.categories &&
               data.categories.map((category: Category) => (
-                <div>
-                  <SwiperSlide className="rounded-2xl overflow-hidden">
-                    <Link
-                      to={`/search?category=${category.id}`}
-                      className="relative bg-[#E6E9F2] rounded-2xl overflow-hidden py-3 w-full group cursor-pointer"
-                    >
-                      <img
-                        src={category.image}
-                        alt=""
-                        className="w-50 aspect-square object-cover mx-auto group-hover:scale-105 transition-all duration-300"
-                      />
-                      <div className="absolute left-0 right-0 top-0 bottom-0 bg-black/20">
-                        <div className="absolute bottom-5 left-10 text-white text-xl font-medium transition-all">
-                          {category.name}
-                        </div>
+                <SwiperSlide
+                  className="rounded-2xl overflow-hidden"
+                  key={category.id}
+                >
+                  <Link
+                    to={`/search?category=${category.id}`}
+                    className="relative bg-[#E6E9F2] rounded-2xl overflow-hidden py-3 w-full group cursor-pointer"
+                  >
+                    <img
+                      src={category.image}
+                      alt=""
+                      className="w-50 aspect-square object-cover mx-auto group-hover:scale-105 transition-all duration-300"
+                    />
+                    <div className="absolute left-0 right-0 top-0 bottom-0 bg-black/20">
+                      <div className="absolute bottom-5 left-10 text-white text-xl font-medium transition-all">
+                        {category.name}
                       </div>
-                    </Link>
-                  </SwiperSlide>
-                </div>
+                    </div>
+                  </Link>
+                </SwiperSlide>
               ))}
         </Swiper>
       }

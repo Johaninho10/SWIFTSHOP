@@ -6,8 +6,12 @@ const baseUrl = import.meta.env.VITE_BASE_URL + "/product";
 const productsApi = createApi({
   reducerPath: "productsApi",
   baseQuery: fetchBaseQuery({ baseUrl, credentials: "include" }),
-  tagTypes: ["NewArrivals"],
+  tagTypes: ["NewArrivals", "Product"],
   endpoints: (build) => ({
+    getProduct: build.query({
+      query: (id) => `/${id}`,
+      providesTags: ["Product"]
+    }),
     getNewArrivals: build.query({
       query: () => "/new-arrivals",
       providesTags: ["NewArrivals"],
@@ -29,5 +33,9 @@ const productsApi = createApi({
   }),
 });
 
-export const { useGetNewArrivalsQuery, useToggleWishMutation } = productsApi;
+export const {
+  useGetNewArrivalsQuery,
+  useGetProductQuery,
+  useToggleWishMutation,
+} = productsApi;
 export default productsApi;

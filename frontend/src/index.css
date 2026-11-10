@@ -1,12 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+body {
+  font-family: "Inter", "sans-serif"
+}
+
 @import "tailwindcss";
 
 @plugin "daisyui" {
-  themes: "false"
+  themes: "false";
 }
 
 @theme {
-  --color-primary: #0040A1;
-  --color-secondary: #FFFFFF
+  --color-primary: #0040a1;
+  --color-secondary: #ffffff;
+  --color-inverse: #2e3038;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -31,34 +38,35 @@ select {
 }
 
 .css-1jaky35-MuiFormControl-root-MuiTextField-root input {
-  background-color: #F2F3FE !important;
+  background-color: #f2f3fe !important;
   border-radius: 5px !important;
 }
 
-.swiper{
+.swiper {
   position: relative !important;
 }
 
-.swiper-button-next, .swiper-button-prev{
-  background-color: #0040A1;
+.swiper-button-next,
+.swiper-button-prev {
+  background-color: #0040a1;
   width: 40px !important;
   height: 40px !important;
   border-radius: 50%;
 }
-.swiper-button-prev{
+.swiper-button-prev {
   position: absolute !important;
   top: 50% !important;
   left: 15px !important;
 }
 
-.swiper-button-next{
+.swiper-button-next {
   position: absolute !important;
   top: 50% !important;
   right: 15px !important;
 }
 
-.swiper-navigation-icon{
+.swiper-navigation-icon {
   height: 20px !important;
-  width:  10px !important;
+  width: 10px !important;
   color: white;
 }

@@ -7,6 +7,7 @@ import VerifyEmail from "../pages/VerifyEmail";
 import ProtectedRoutes from "../pages/ProtectedRoutes";
 import WishList from "../pages/WishList";
 import Cart from "../pages/Cart";
+import Details from "../pages/Details";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: "/cart",
         element: <Cart />,
+      },
+      {
+        path: "/product/:id",
+        element: <Details />,
       },
       {
         path: "",

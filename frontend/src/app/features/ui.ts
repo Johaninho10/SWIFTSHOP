@@ -4,7 +4,6 @@ const uiSlice = createSlice({
   name: "ui",
   initialState: {
     theme: localStorage.getItem("theme") || "light",
-    bannerImages: [],
   },
   reducers: {
     toggleTheme: (state) => {

@@ -2,9 +2,26 @@ import type { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
 import prisma from "../lib/prisma";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import transporter from "../lib/nodemailer";
 import verficationEmail from "../emails/verification-email";
+import { User } from "../generated/prisma/client";
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+    }
+  }
+}
+
+interface AuthPayload extends JwtPayload {
+  userId: string;
+}
+
+interface CartPayload extends JwtPayload {
+  cartId: string;
+}
 
 type Inputs = {
   firstname: string;
@@ -163,7 +180,10 @@ export const sendVerificationOTP = asyncHandler(
       throw new Error("No token provided");
     }
 
-    const { userId } = jwt.verify(OTPToken, String(process.env.JWT_SECRET_KEY));
+    const { userId } = jwt.verify(
+      OTPToken,
+      String(process.env.JWT_SECRET_KEY),
+    ) as AuthPayload;
 
     const user = await prisma.pendingUser.findUnique({
       where: {
@@ -221,7 +241,10 @@ export const verifyEmail = asyncHandler(
       throw new Error("No Code sent");
     }
 
-    const { userId } = jwt.verify(OTPToken, String(process.env.JWT_SECRET_KEY));
+    const { userId } = jwt.verify(
+      OTPToken,
+      String(process.env.JWT_SECRET_KEY),
+    ) as AuthPayload;
 
     const user = await prisma.pendingUser.findUnique({
       where: {
@@ -305,101 +328,88 @@ export const signIn = asyncHandler(
     let cart: any = [];
 
     if (cartToken) {
-      const { cartId } = jwt.verify(
-        cartToken,
-        String(process.env.JWT_SECRET_KEY),
-      );
-      if (!user.cartId) {
-        await prisma.user.update({
-          where: {
-            id: user.id,
-          },
-          data: {
-            cartId,
-          },
-        });
-      } else {
-        const cartItems = await prisma.cartItems.findMany({
-          where: {
-            cartId: user.cartId,
-          },
+      let cartId: string | undefined;
+      try {
+        const payload = jwt.verify(
+          cartToken,
+          String(process.env.JWT_SECRET_KEY),
+        ) as CartPayload;
+        cartId = payload.cartId;
+      } catch (err) {
+        // Invalid or expired token, ignore guest cart
+      }
+
+      if (cartId) {
+        const guestCart = await prisma.cart.findUnique({
+          where: { id: cartId },
         });
 
-        const addedCartItems = await prisma.cartItems.findMany({
-          where: {
-            cartId,
-          },
-        });
-
-        const productsIDs = cartItems.map((item) => item.productId);
-
-        addedCartItems.forEach(async (item) => {
-          if (productsIDs.includes(item.productId)) {
-            const current = cartItems.find(
-              (cartItem) => cartItem.productId === item.productId,
-            );
-            await prisma.cartItems.update({
+        if (guestCart) {
+          if (!user.cartId) {
+            await prisma.user.update({
               where: {
-                cartId_productId: {
-                  cartId: String(user.cartId),
-                  productId: item.productId,
-                },
+                id: user.id,
               },
               data: {
-                quantity: Number(current?.quantity) + item.quantity,
+                cartId,
               },
             });
+            user.cartId = cartId;
           } else {
-            await prisma.cartItems.update({
+            const cartItems = await prisma.cartItems.findMany({
               where: {
-                cartId_productId: {
-                  cartId,
-                  productId: item.productId,
-                },
+                cartId: user.cartId,
               },
-              data: {
-                cartId: String(user.cartId),
+            });
+
+            const addedCartItems = await prisma.cartItems.findMany({
+              where: {
+                cartId,
+              },
+            });
+
+            for (const item of addedCartItems) {
+              const current = cartItems.find(
+                (cartItem) =>
+                  cartItem.productId === item.productId &&
+                  cartItem.color.trim() === item.color.trim(),
+              );
+
+              if (current) {
+                await prisma.cartItems.update({
+                  where: {
+                    id: current.id,
+                  },
+                  data: {
+                    quantity: current.quantity + item.quantity,
+                  },
+                });
+                await prisma.cartItems.delete({
+                  where: {
+                    id: item.id,
+                  },
+                });
+              } else {
+                await prisma.cartItems.update({
+                  where: {
+                    id: item.id,
+                  },
+                  data: {
+                    cartId: String(user.cartId),
+                  },
+                });
+              }
+            }
+
+            await prisma.cart.delete({
+              where: {
+                id: cartId,
               },
             });
           }
-        });
-        await prisma.cartItems.deleteMany({
-          where: {
-            cartId,
-          },
-        });
-
-        await prisma.cart.delete({
-          where: {
-            id: cartId,
-          },
-        });
+        }
       }
 
-      cart = (
-        await prisma.cart.findUnique({
-          where: {
-            id: user.cartId ? user.cartId : cartId,
-          },
-          select: {
-            cartItems: {
-              select: {
-                product: {
-                  include: {
-                    images: {
-                      select: {
-                        url: true,
-                      },
-                    },
-                  },
-                },
-                quantity: true,
-              },
-            },
-          },
-        })
-      )?.cartItems;
-    } else {
       if (user.cartId) {
         cart = (
           await prisma.cart.findUnique({
@@ -408,7 +418,7 @@ export const signIn = asyncHandler(
             },
             select: {
               cartItems: {
-                select: {
+                include: {
                   product: {
                     include: {
                       images: {
@@ -418,7 +428,31 @@ export const signIn = asyncHandler(
                       },
                     },
                   },
-                  quantity: true,
+                },
+              },
+            },
+          })
+        )?.cartItems;
+      }
+    } else {
+      if (user.cartId) {
+        cart = (
+          await prisma.cart.findUnique({
+            where: {
+              id: user.cartId,
+            },
+            select: {
+              cartItems: {
+                include: {
+                  product: {
+                    include: {
+                      images: {
+                        select: {
+                          url: true,
+                        },
+                      },
+                    },
+                  },
                 },
               },
             },

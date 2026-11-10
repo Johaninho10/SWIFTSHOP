@@ -20,7 +20,7 @@ const App = () => {
 
   const { data, isLoading } = useGetUserQuery(null);
 
-  const { data: cartData } = useGetCartQuery(null);
+  const { data: cartData, isLoading: cartLoading } = useGetCartQuery(null);
 
   const dispatch = useDispatch();
 
@@ -55,7 +55,8 @@ const App = () => {
       document.documentElement.classList.add("dark");
     }
   }, [theme]);
-  return isLoading ? (
+
+  return isLoading || cartLoading ? (
     <div className="w-screen h-screen flex justify-center items-center bg-secondary dark:bg-gray-800">
       <motion.img
         src={theme === "dark" ? "/logo-white.png" : "/logo.png"}

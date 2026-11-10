@@ -65,11 +65,20 @@ const Navbar = () => {
   const cartQuantity =
     cart.length === 0 ? 0 : cart.reduce((acc, item) => acc + item.quantity, 0);
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
+  const [navSearch, setNavSearch] = useState<string>("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [signOut] = useSignOutMutation();
+
+  const handleNavSearch = () => {
+    if (navSearch.trim()) {
+      navigate(`/search?q=${encodeURIComponent(navSearch.trim())}`);
+    } else {
+      navigate("/search");
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -107,26 +116,43 @@ const Navbar = () => {
         <div className="relative hidden sm:block">
           <input
             type="text"
-            className="py-2 pl-11 border border-slate-400 dark:bg-slate-700/80 bg-[#F2F3FE] text-slate-800 dark:text-white rounded-lg  w-85 md:w-90 lg:w-100 focus:ring-1 focus:ring-primary transition-all duration-300"
+            value={navSearch}
+            onChange={(e) => setNavSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleNavSearch();
+              }
+            }}
+            className="py-2 pl-11 pr-4 border border-slate-400 dark:border-slate-600 dark:bg-slate-700/80 bg-[#F2F3FE] text-slate-800 dark:text-white rounded-lg w-85 md:w-90 lg:w-100 focus:ring-1 focus:ring-primary transition-all duration-300 outline-none"
             placeholder="Search a product..."
           />
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 dark:text-white" />
+          <button
+            type="button"
+            onClick={handleNavSearch}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 dark:text-white hover:text-primary transition-colors cursor-pointer"
+          >
+            <Search size={18} />
+          </button>
         </div>
 
         <div className="flex items-center space-x-3">
-          <button className="sm:hidden w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all">
+          <button
+            className="sm:hidden w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all cursor-pointer"
+            onClick={() => navigate("/search")}
+            title="Search"
+          >
             <Search className="" />
           </button>
 
           <button
-            className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all"
+            className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all cursor-pointer"
             onClick={() => navigate("/wishlist")}
           >
             <Heart className="" />
           </button>
 
           <button
-            className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all relative"
+            className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all relative cursor-pointer"
             onClick={() => navigate("/cart")}
           >
             <ShoppingCart className="" />
@@ -136,14 +162,14 @@ const Navbar = () => {
           </button>
 
           <button
-            className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all"
+            className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all cursor-pointer"
             onClick={() => dispatch(toggleTheme())}
           >
             {theme === "dark" ? <Moon /> : <Sun />}
           </button>
           {user && (
             <button
-              className="sm:hidden w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all"
+              className="sm:hidden w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all cursor-pointer"
               onClick={() => setShowSidebar(true)}
             >
               <Menu className="" />
@@ -175,7 +201,7 @@ const Navbar = () => {
                   </a>
                 </li>
                 <li
-                  className="hover:bg-slate-200/60 dark:hover:bg-gray-600 rounded-md text-[16px] py-1"
+                  className="hover:bg-slate-200/60 dark:hover:bg-gray-600 rounded-md text-[16px] py-1 cursor-pointer"
                   onClick={handleSignOut}
                 >
                   <a className="text-slate-700 dark:text-gray-200 font-medium flex space-x-2 items-center">
@@ -187,7 +213,7 @@ const Navbar = () => {
             </div>
           ) : (
             <button
-              className="bg-primary dark:bg-white  rounded-lg py-3 px-4 flex justify-center items-center space-x-2 text-white dark:text-primary  transition-all"
+              className="bg-primary rounded-lg py-3 px-4 flex justify-center items-center space-x-2 text-white transition-all cursor-pointer"
               onClick={() => navigate("/signin")}
             >
               <span className="text-sm">Sign In</span>

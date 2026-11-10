@@ -7,6 +7,7 @@ import userApi from "./services/user";
 import categoriesApi from "./services/categories";
 import productsApi from "./services/products";
 import cartApi from "./services/cart";
+import reviewsApi from "./services/reviews";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
 const store = configureStore({
@@ -17,6 +18,7 @@ const store = configureStore({
     [categoriesApi.reducerPath]: categoriesApi.reducer,
     [productsApi.reducerPath]: productsApi.reducer,
     [cartApi.reducerPath]: cartApi.reducer,
+    [reviewsApi.reducerPath]: reviewsApi.reducer,
     user: userSlice,
     cart: cartSlice,
   },
@@ -27,6 +29,7 @@ const store = configureStore({
       categoriesApi.middleware,
       productsApi.middleware,
       cartApi.middleware,
+      reviewsApi.middleware
     ),
 });
 

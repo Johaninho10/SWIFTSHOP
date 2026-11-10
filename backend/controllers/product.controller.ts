@@ -2,7 +2,8 @@ import type { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
 import cloudinary from "../lib/cloudinary";
 import prisma from "../lib/prisma";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { Image, Product, User } from "../generated/prisma/client";
 
 type Inputs = {
   title?: string;
@@ -14,9 +15,25 @@ type Inputs = {
   subCategoriesIDs: string;
 };
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+    }
+  }
+}
+
+interface AuthPayload extends JwtPayload {
+  userId: string;
+}
+
+interface CartPayload extends JwtPayload {
+  cartId: string;
+}
+
 export const getNewArrivals = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    let products = await prisma.product.findMany({
+    let products: any = await prisma.product.findMany({
       orderBy: {
         createdAt: "desc",
       },
@@ -30,28 +47,61 @@ export const getNewArrivals = asyncHandler(
       },
     });
 
+    const productsIDs = products.map((product: any) => product.id);
+
+    const reviewsGroupBy = await prisma.review.groupBy({
+      by: "productId",
+      _avg: {
+        rate: true,
+      },
+      _count: {
+        id: true,
+      },
+      where: {
+        productId: {
+          in: productsIDs,
+        },
+      },
+    });
+
     const { token } = req.cookies;
 
-    let user;
     let wishedProductsIDs: string[] = [];
 
     if (token) {
-      const { userId } = jwt.verify(token, String(process.env.JWT_SECRET_KEY));
+      const { userId } = jwt.verify(
+        token,
+        String(process.env.JWT_SECRET_KEY),
+      ) as AuthPayload;
       const user = await prisma.user.findUnique({
         where: {
           id: userId,
         },
       });
-
+      if(!user){
+        throw new Error()
+      }
       const wishes = await prisma.wish.findMany();
       wishedProductsIDs = wishes.map((wish) => wish.productId);
     }
 
-    products = products.map((product) => {
+    products = products.map((product: any) => {
       if (wishedProductsIDs.includes(product.id)) {
         product.saved = true;
       } else {
         product.saved = false;
+      }
+
+      const reviewGroupBy = reviewsGroupBy.find(
+        (item) => item.productId === product.id,
+      );
+
+      if (reviewGroupBy) {
+        product.rate = reviewGroupBy._avg.rate;
+        product.reviews = reviewGroupBy._count.id;
+      } else {
+        product.rate = 0;
+        product.reviews = 0;
       }
       return product;
     });
@@ -67,7 +117,7 @@ export const getProduct = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
-    const product = await prisma.product.findUnique({
+    const product: any = await prisma.product.findUnique({
       where: {
         id: String(id),
       },
@@ -84,6 +134,55 @@ export const getProduct = asyncHandler(
       throw new Error("Product not found");
     }
 
+    
+
+    const reviews = await prisma.review.count({
+      where: {
+        productId: product.id,
+      },
+    });
+
+    product.reviews = reviews || 0;
+
+    const reviewGroupBy = await prisma.review.groupBy({
+      by: "productId",
+      where: {
+        productId: product.id,
+      },
+      _avg: {
+        rate: true,
+      },
+    });
+    
+
+    product.rate = reviewGroupBy[0]?._avg?.rate || 0;
+
+    let saved = false;
+
+    const { token } = req.cookies;
+
+    if (token) {
+      const { userId } = jwt.verify(
+        token,
+        String(process.env.JWT_SECRET_KEY),
+      ) as AuthPayload;
+
+      const wish = await prisma.wish.findUnique({
+        where: {
+          userId_productId: {
+            userId,
+            productId: String(id),
+          },
+        },
+      });
+
+      if (wish) {
+        saved = true;
+      }
+    }
+
+    product.saved = saved;
+
     res.status(200).json({
       success: true,
       product,
@@ -92,7 +191,7 @@ export const getProduct = asyncHandler(
 );
 
 export const createProduct = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response) => {
     const files = req.files;
 
     const {
@@ -103,9 +202,9 @@ export const createProduct = asyncHandler(
       colors,
       categoriesIDs,
       subCategoriesIDs,
-    }: Inputs = req.body;
+    }: Inputs = req.body;    
 
-    if (files?.length === 0) {
+    if (!files || files?.length === 0) {
       throw new Error("You must upload at least one image of the product");
     }
 
@@ -142,7 +241,7 @@ export const createProduct = asyncHandler(
     }
 
     const results = await Promise.all(
-      files?.map((file) =>
+      files.map((file: any) =>
         cloudinary.uploader.upload(file.path, {
           resource_type: "image",
           folder: "products",
@@ -150,7 +249,7 @@ export const createProduct = asyncHandler(
       ),
     );
 
-    const images: string[] = results.map((result) => result.secure_url);
+    const images: string[] = results.map((result: any) => result.secure_url);
 
     const product = await prisma.product.create({
       data: {
@@ -230,7 +329,7 @@ export const updateProduct = asyncHandler(
 
     if (files?.length !== 0) {
       const results = await Promise.all(
-        files?.map((file) =>
+        new Array(files).map((file: any) =>
           cloudinary.uploader.upload(file.path, {
             resource_type: "image",
             folder: "products",
@@ -348,6 +447,10 @@ export const toggleWish = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { productId } = req.body;
     const { user } = req;
+
+    if (!user) {
+      throw new Error("You must be authenticated");
+    }
 
     if (!productId) {
       throw new Error("You must provide the id of the product");

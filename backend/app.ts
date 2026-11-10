@@ -7,9 +7,9 @@ import authRouter from "./routes/auth.routes";
 import userRouter from "./routes/user.routes";
 import categoryRouter from "./routes/category.routes";
 import subCategoryRouter from "./routes/subcategory.routes";
-import bannerRouter from "./routes/banner.routes";
 import productRouter from "./routes/product.routes";
 import cartRouter from "./routes/cart.routes";
+import reviewRouter from "./routes/reviews.routes";
 
 // Creating express server
 const app = express();
@@ -30,9 +30,9 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/category", categoryRouter);
 app.use("/api/v1/subcategory", subCategoryRouter);
-app.use("/api/v1/banner", bannerRouter);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/cart", cartRouter);
+app.use("/api/v1/review", reviewRouter);
 
 // Error Middleware
 app.use(errorMiddleware);

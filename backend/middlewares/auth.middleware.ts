@@ -6,6 +6,7 @@ import prisma from "../lib/prisma";
 const authMiddleware = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { token } = req.cookies;
+    
 
     if (!token) {
       throw new Error("No token provided!");

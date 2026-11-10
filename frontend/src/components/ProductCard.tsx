@@ -23,6 +23,8 @@ type Product = {
   brand: string;
   description: string;
   price: number;
+  rate: number;
+  reviews: number;
   saved: boolean;
   images: Image[];
 };
@@ -128,11 +130,11 @@ const ProductCard = (product: Product) => {
       transition={{ duration: 1, ease: "easeInOut" }}
     >
       <div className="bg-[#E6E9F2] rounded-lg overflow-hidden w-full h-40 md:h-50 flex justify-center items-center group relative">
-        <Link to={`/product/${product.id}`}>
+        <Link className="" to={`/product/${product.id}`}>
           <img
             src={product.images[0].url}
             alt="product"
-            className="w-full h-full object-cover group-hover:scale-110 transition-all duration-300"
+            className="w-full h-35 md:h-45 object-cover group-hover:scale-110 transition-all duration-300"
           />
         </Link>
         <button
@@ -155,50 +157,14 @@ const ProductCard = (product: Product) => {
         </h2>
         <p className="text-slate-500 ">{product.brand}</p>
         <div className="flex justify-between">
-          <BasicRating rate={4.5} readOnly={true} />
-          <p className="text-slate-500 dark:text-gray-300 text-sm">4.7 (208)</p>
+          <BasicRating rate={product.rate} readOnly={true} />
+          <p className="text-slate-500 dark:text-gray-300 text-sm">
+            {Number(product.rate).toFixed(2)} ({product.reviews})
+          </p>
         </div>
         <p className="text-primary font-medium dark:text-white text-[18px]">
-          {product.price} FCFA
+          {product.price.toLocaleString()} FCFA
         </p>
-        <div className="flex justify-between items-center">
-          <div className="flex space-x-3 items-center">
-            <button
-              className="w-10 h-10 rounded-full flex justify-center items-center text-red-500 text-xl bg-red-300 font-bold"
-              onClick={() => {
-                if (quantity !== 1) {
-                  setQuantity((prev) => prev - 1);
-                }
-              }}
-            >
-              -
-            </button>
-            <span className="text-slate-700 dark:text-gray-300">
-              {quantity}
-            </span>
-            <button
-              className="w-10 h-10 rounded-full flex justify-center items-center text-green-500 text-xl bg-emerald-200 font-bold"
-              onClick={() => setQuantity((prev) => prev + 1)}
-            >
-              +
-            </button>
-          </div>
-          <div className=""></div>
-        </div>
-        <button
-          disabled={addToCartLoading || updateCartLoading}
-          className={`bg-primary dark:bg-white dark:text-primary text-white py-2 rounded-lg flex justify-center items-center mt-2 font-medium`}
-          onClick={handleAddToCart}
-        >
-          {addToCartLoading || updateCartLoading ? (
-            <Loader className="animate-spin" />
-          ) : (
-            <div className="flex items-center space-x-2">
-              <span>Add to Cart</span>
-              <ShoppingCart className="group-hover:scale-115 transition-all duration-300" />
-            </div>
-          )}
-        </button>
       </div>
     </motion.div>
   );

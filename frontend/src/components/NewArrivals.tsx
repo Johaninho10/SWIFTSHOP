@@ -12,6 +12,8 @@ type Product = {
   brand: string;
   description: string;
   price: number;
+  rate: number;
+  reviews: number;
   saved: boolean;
   images: Image[];
 };
@@ -32,7 +34,7 @@ const NewArrivals = () => {
       </h1>
       <p className="mt-1 text-slate-600 dark:text-gray-100">See what's new</p>
 
-      <div className="pt-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-5 md:gap-x-6 gap-y-5">
+      <div className="pt-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-5 gap-y-5">
         {isLoading &&
           new Array(5)
             .fill(0)

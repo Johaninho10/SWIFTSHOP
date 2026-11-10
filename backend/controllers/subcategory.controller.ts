@@ -34,6 +34,11 @@ export const createSubCategory = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { categoryId, name }: { categoryId: string; name: string } = req.body;
 
+    if(!categoryId){
+      res.status(400)
+      throw new Error("The category id is required")
+    }
+
     const category = await prisma.category.findUnique({
       where: {
         id: categoryId,

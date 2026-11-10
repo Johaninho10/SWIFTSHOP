@@ -9,8 +9,12 @@ const categoriesApi = createApi({
     getPopularCategories: build.query({
       query: () => "/popular",
     }),
+    getCategories: build.query({
+      query: () => "/",
+    }),
   }),
 });
 
-export const { useGetPopularCategoriesQuery } = categoriesApi;
+export const { useGetPopularCategoriesQuery, useGetCategoriesQuery } =
+  categoriesApi;
 export default categoriesApi;
