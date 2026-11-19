@@ -79,8 +79,7 @@ const ReviewItem = ({
           </div>
         </div>
 
-        {/* Action buttons (only for review owner) */}
-        {user.id == review.userId && (
+        {user?.id == review.userId && (
           <div className="flex items-center gap-x-2 shrink-0">
             <button
               className="p-2.5 rounded-lg bg-primary transition-colors"
