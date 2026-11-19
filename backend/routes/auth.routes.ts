@@ -5,7 +5,7 @@ import {
   signOut,
   signUp,
   verifyEmail,
-} from "../controllers/auth.controller";
+} from "../controllers/auth.controller.js";
 
 // Creating an express router
 const authRouter = Router();

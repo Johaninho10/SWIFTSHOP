@@ -1,9 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
+// import "multer";
 import asyncHandler from "express-async-handler";
-import cloudinary from "../lib/cloudinary";
-import prisma from "../lib/prisma";
+import cloudinary from "../lib/cloudinary.js";
+import prisma from "../lib/prisma.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { Image, Product, User } from "../generated/prisma/client";
+import { User } from "../generated/prisma/client.js";
 
 type Inputs = {
   title?: string;
@@ -27,9 +28,190 @@ interface AuthPayload extends JwtPayload {
   userId: string;
 }
 
-interface CartPayload extends JwtPayload {
-  cartId: string;
-}
+// interface CartPayload extends JwtPayload {
+//   cartId: string;
+// }
+
+export const getProducts = asyncHandler(
+  async (
+    req: Request<
+      {},
+      unknown,
+      unknown,
+      { query?: string; category?: string; subCategory?: string; page?: string }
+    >,
+    res: Response,
+  ) => {
+    const { query, category, subCategory, page = "1" } = req.query;
+
+    const where: any = {};
+
+    if (isNaN(Number(page))) {
+      res.status(400);
+      throw new Error("The page must be a number");
+    }
+
+    if (parseInt(page) !== Number(page) || parseInt(page) < 1) {
+      res.status(400);
+      throw new Error("Invalid page parameter");
+    }
+
+    if (query?.trim()) {
+      const searchTerm = query.trim();
+
+      const [matchingCategories, matchingSubCategories] = await Promise.all([
+        prisma.category.findMany({
+          where: { name: { contains: searchTerm, mode: "insensitive" } },
+          select: { id: true },
+        }),
+        prisma.subCategory.findMany({
+          where: { name: { contains: searchTerm, mode: "insensitive" } },
+          select: { id: true },
+        }),
+      ]);
+
+      const categoryIds = matchingCategories.map((c) => c.id);
+      const subCategoryIds = matchingSubCategories.map((sc) => sc.id);
+
+      where.OR = [
+        {
+          title: {
+            contains: searchTerm,
+            mode: "insensitive",
+          },
+        },
+        {
+          brand: {
+            contains: searchTerm,
+            mode: "insensitive",
+          },
+        },
+        ...(categoryIds.length > 0
+          ? [
+              {
+                categoriesIDs: {
+                  hasSome: categoryIds,
+                },
+              },
+            ]
+          : []),
+        ...(subCategoryIds.length > 0
+          ? [
+              {
+                subCategoriesIDs: {
+                  hasSome: subCategoryIds,
+                },
+              },
+            ]
+          : []),
+      ];
+    }
+
+    if (category) {
+      where.categoriesIDs = {
+        has: category,
+      };
+    }
+
+    if (subCategory) {
+      where.subCategoriesIDs = {
+        has: subCategory,
+      };
+    }
+
+    const total = await prisma.product.count({
+      where,
+    });
+
+    const take = 10;
+
+    let products = await prisma.product.findMany({
+      where,
+      take,
+      skip: (parseInt(page) - 1) * take,
+      include: {
+        images: {
+          select: {
+            url: true,
+          },
+        },
+      },
+    });
+
+    const productsIDs = products.map((product: any) => product.id);
+
+    const reviewsGroupBy = await prisma.review.groupBy({
+      by: "productId",
+      _avg: {
+        rate: true,
+      },
+      _count: {
+        id: true,
+      },
+      where: {
+        productId: {
+          in: productsIDs,
+        },
+      },
+    });
+
+    const { token } = req.cookies;
+
+    let wishedProductsIDs: string[] = [];
+
+    if (token) {
+      const { userId } = jwt.verify(
+        token,
+        String(process.env.JWT_SECRET_KEY),
+      ) as AuthPayload;
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) {
+        throw new Error();
+      }
+      const wishes = await prisma.wish.findMany({
+        where: {
+          userId: user.id,
+        },
+      });
+      wishedProductsIDs = wishes.map((wish) => wish.productId);
+    }
+
+    products = products.map((product: any) => {
+      if (wishedProductsIDs.includes(product.id)) {
+        product.saved = true;
+      } else {
+        product.saved = false;
+      }
+
+      const reviewGroupBy = reviewsGroupBy.find(
+        (item) => item.productId === product.id,
+      );
+
+      if (reviewGroupBy) {
+        product.rate = reviewGroupBy._avg.rate;
+        product.reviews = reviewGroupBy._count.id;
+      } else {
+        product.rate = 0;
+        product.reviews = 0;
+      }
+      return product;
+    });
+
+    const totalPages = Math.ceil(total / take);
+
+    res.status(200).json({
+      success: true,
+      products,
+      page: parseInt(page),
+      totalPages,
+      total,
+    });
+  },
+);
 
 export const getNewArrivals = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -78,10 +260,14 @@ export const getNewArrivals = asyncHandler(
           id: userId,
         },
       });
-      if(!user){
-        throw new Error()
+      if (!user) {
+        throw new Error();
       }
-      const wishes = await prisma.wish.findMany();
+      const wishes = await prisma.wish.findMany({
+        where: {
+          userId: user.id,
+        },
+      });
       wishedProductsIDs = wishes.map((wish) => wish.productId);
     }
 
@@ -134,8 +320,6 @@ export const getProduct = asyncHandler(
       throw new Error("Product not found");
     }
 
-    
-
     const reviews = await prisma.review.count({
       where: {
         productId: product.id,
@@ -153,7 +337,6 @@ export const getProduct = asyncHandler(
         rate: true,
       },
     });
-    
 
     product.rate = reviewGroupBy[0]?._avg?.rate || 0;
 
@@ -190,9 +373,118 @@ export const getProduct = asyncHandler(
   },
 );
 
+export const getSimilarProducts = asyncHandler(
+  async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+
+    if (!id) {
+      res.status(400);
+      throw new Error("The id of the product is required");
+    }
+
+    const product = await prisma.product.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!product) {
+      res.status(404);
+      throw new Error("Product not found");
+    }
+
+    let products = await prisma.product.findMany({
+      where: {
+        categoriesIDs: {
+          hasSome: product.categoriesIDs,
+        },
+        id: {
+          not: product.id,
+        },
+      },
+      include: {
+        images: {
+          select: {
+            url: true
+          }
+        }
+      },
+      take: 5,
+    });
+
+    const productsIDs = products.map((product: any) => product.id);
+
+    const reviewsGroupBy = await prisma.review.groupBy({
+      by: "productId",
+      _avg: {
+        rate: true,
+      },
+      _count: {
+        id: true,
+      },
+      where: {
+        productId: {
+          in: productsIDs,
+        },
+      },
+    });
+
+    const { token } = req.cookies;
+
+    let wishedProductsIDs: string[] = [];
+
+    if (token) {
+      const { userId } = jwt.verify(
+        token,
+        String(process.env.JWT_SECRET_KEY),
+      ) as AuthPayload;
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) {
+        throw new Error();
+      }
+      const wishes = await prisma.wish.findMany({
+        where: {
+          userId: user.id,
+        },
+      });
+      wishedProductsIDs = wishes.map((wish) => wish.productId);
+    }
+
+    products = products.map((product: any) => {
+      if (wishedProductsIDs.includes(product.id)) {
+        product.saved = true;
+      } else {
+        product.saved = false;
+      }
+
+      const reviewGroupBy = reviewsGroupBy.find(
+        (item) => item.productId === product.id,
+      );
+
+      if (reviewGroupBy) {
+        product.rate = reviewGroupBy._avg.rate;
+        product.reviews = reviewGroupBy._count.id;
+      } else {
+        product.rate = 0;
+        product.reviews = 0;
+      }
+      return product;
+    });
+
+    res.status(200).json({
+      success: true,
+      products,
+    });
+  },
+);
+
 export const createProduct = asyncHandler(
   async (req: Request, res: Response) => {
-    const files = req.files;
+    const files = req.files as Express.Multer.File[] | undefined;
 
     const {
       title,
@@ -202,7 +494,7 @@ export const createProduct = asyncHandler(
       colors,
       categoriesIDs,
       subCategoriesIDs,
-    }: Inputs = req.body;    
+    }: Inputs = req.body;
 
     if (!files || files?.length === 0) {
       throw new Error("You must upload at least one image of the product");
@@ -281,7 +573,7 @@ export const createProduct = asyncHandler(
 
 export const updateProduct = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const files = req.files;
+    const files = req.files as Express.Multer.File[] | undefined;
     const { id } = req.params;
     const {
       title,

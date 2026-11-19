@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
-import prisma from "../lib/prisma";
+import prisma from "../lib/prisma.js";
 import asyncHandler from "express-async-handler";
-import { User } from "../generated/prisma/client";
+import { User } from "../generated/prisma/client.js";
 
 declare global {
   namespace Express {

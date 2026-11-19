@@ -5,7 +5,7 @@ import PopularCategories from "../components/PopularCategories";
 
 const Home = () => {
   return (
-    <div>
+    <div className="pt-[10vh] dark:bg-gray-950">
       <Navbar />
       <Hero />
       <PopularCategories />

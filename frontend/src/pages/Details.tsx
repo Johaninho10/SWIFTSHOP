@@ -1,13 +1,23 @@
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { useGetProductQuery } from "../app/services/products";
-import { useEffect, useState } from "react";
+import {
+  useGetProductQuery,
+  useGetSimilarProductsQuery,
+} from "../app/services/products";
+import { useEffect, useRef, useState } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation, Autoplay } from "swiper/modules";
-import { Check, Heart, ShoppingCart, Loader } from "lucide-react";
+import {
+  Check,
+  Heart,
+  ShoppingCart,
+  Loader,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import {
@@ -24,6 +34,8 @@ import ReviewItem from "../components/ReviewItem";
 import { motion } from "motion/react";
 import UpdateReview from "../components/UpdateReview";
 import ShowReviews from "../components/ShowReviews";
+import ProductCardSkeleton from "../components/ProductCardSkeleton";
+import ProductCard from "../components/ProductCard";
 
 type Image = {
   url: string;
@@ -82,6 +94,9 @@ const Details = () => {
     error,
   }: { data: Data; isLoading: boolean; error: Error } = useGetProductQuery(id);
 
+  const { data: similarProductsData, isLoading: similarProductsLoading } =
+    useGetSimilarProductsQuery(id);
+
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>();
   const [selectedColor, setSelectedColor] = useState<string>();
@@ -115,14 +130,17 @@ const Details = () => {
 
   const [selectedReview, setSelectedReview] = useState("");
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const prevEl = useRef<HTMLButtonElement>(null);
+  const nextEl = useRef<HTMLButtonElement>(null);
 
   const [addToCart, { isLoading: addToCartLoading }] = useAddToCartMutation();
   const [updateCart, { isLoading: updateCartLoading }] =
     useUpdateCartMutation();
-  const { data: reviewsData, isLoading: isReviewsLoading } = useFetchReviewsQuery({
-    productId: id,
-    page: 1,
-  });
+  const { data: reviewsData, isLoading: isReviewsLoading } =
+    useFetchReviewsQuery({
+      productId: id,
+      page: 1,
+    });
 
   const handleAddToCart = async () => {
     const cartItem = cart.find(
@@ -182,11 +200,11 @@ const Details = () => {
   }, [data, isLoading]);
 
   return (
-    <div className="min-h-screen dark:bg-gray-800">
+    <div className="min-h-screen dark:bg-gray-950 pt-[10vh]">
       <Navbar />
 
       {/* ── Main Product Section (Images & Info) ── */}
-      <div className="px-5 md:px-[5%] lg:px-[10%] grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-5 pt-5 dark:bg-gray-800">
+      <div className="px-5 md:px-[5%] lg:px-[10%] grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-5 pt-10">
         {/* Left Column: Image Gallery */}
         <div className="w-full flex flex-col min-w-0 gap-x-5 gap-y-5">
           {isLoading ? (
@@ -194,12 +212,17 @@ const Details = () => {
               <Skeleton
                 variant="rounded"
                 animation="wave"
-                className="w-full! h-90! rounded-2xl! dark:bg-gray-700/60!"
+                className="w-full! h-90! rounded-2xl! dark:bg-gray-800/50!"
               />
             </div>
           ) : (
             product && (
-              <div className="bg-[#E6E9F2] h-90 rounded-2xl overflow-hidden w-full flex justify-center items-center relative">
+              <motion.div
+                initial={{ x: -20, opacity: 0, scale: 0.9 }}
+                animate={{ x: 0, opacity: 1, scale: 1 }}
+                transition={{ duration: 1, ease: "easeInOut" }}
+                className="bg-[#E6E9F2] dark:bg-gray-800 h-90 rounded-2xl overflow-hidden w-full flex justify-center items-center relative"
+              >
                 <img
                   src={selectedImage}
                   alt={product.title}
@@ -218,7 +241,7 @@ const Details = () => {
                     <Heart className="text-slate-600" />
                   )}
                 </button>
-              </div>
+              </motion.div>
             )
           )}
 
@@ -230,14 +253,18 @@ const Details = () => {
                   <Skeleton
                     variant="rounded"
                     animation="wave"
-                    className="w-full! h-20! md:h-24! rounded-xl! dark:bg-gray-700/60!"
+                    className="w-full! h-20! md:h-24! rounded-xl! dark:bg-gray-800/50!"
                   />
                 </div>
               ))}
             </div>
           ) : (
             data?.product && (
-              <div>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 1, ease: "easeInOut" }}
+              >
                 <Swiper
                   navigation={true}
                   loop
@@ -251,7 +278,7 @@ const Details = () => {
                 >
                   {data.product.images.map((item) => (
                     <SwiperSlide
-                      className={`bg-[#E6E9F2] rounded-xl cursor-pointer py-2 ${
+                      className={`bg-[#E6E9F2] dark:bg-gray-800 rounded-xl cursor-pointer py-2 ${
                         selectedImage === item.url
                           ? "border-2 border-primary/70"
                           : ""
@@ -267,7 +294,7 @@ const Details = () => {
                     </SwiperSlide>
                   ))}
                 </Swiper>
-              </div>
+              </motion.div>
             )
           )}
         </div>
@@ -279,12 +306,12 @@ const Details = () => {
               <Skeleton
                 variant="rounded"
                 animation="wave"
-                className="h-8! w-4/5! rounded-lg! dark:bg-gray-700/60!"
+                className="h-8! w-4/5! rounded-lg! dark:bg-gray-800/50!"
               />
               <Skeleton
                 variant="rounded"
                 animation="wave"
-                className="h-8! w-1/2! rounded-lg! dark:bg-gray-700/60!"
+                className="h-8! w-1/2! rounded-lg! dark:bg-gray-800/50!"
               />
             </div>
           ) : (
@@ -299,7 +326,7 @@ const Details = () => {
             <Skeleton
               variant="rounded"
               animation="wave"
-              className="w-32! h-5! rounded-md! mt-4! dark:bg-gray-700/60!"
+              className="w-32! h-5! rounded-md! mt-4! dark:bg-gray-800/50!"
             />
           ) : (
             data?.product && (
@@ -313,7 +340,7 @@ const Details = () => {
             <Skeleton
               variant="rounded"
               animation="wave"
-              className="w-36! h-7! mt-4! rounded-md! dark:bg-gray-700/60!"
+              className="w-36! h-7! mt-4! rounded-md! dark:bg-gray-800/50!"
             />
           ) : (
             product && (
@@ -328,12 +355,12 @@ const Details = () => {
               <Skeleton
                 variant="rounded"
                 animation="wave"
-                className="w-28! h-5! rounded-md! dark:bg-gray-700/60!"
+                className="w-28! h-5! rounded-md! dark:bg-gray-800/50!"
               />
               <Skeleton
                 variant="rounded"
                 animation="wave"
-                className="w-20! h-5! rounded-md! dark:bg-gray-700/60!"
+                className="w-20! h-5! rounded-md! dark:bg-gray-800/50!"
               />
             </div>
           ) : (
@@ -353,14 +380,14 @@ const Details = () => {
               <Skeleton
                 variant="rounded"
                 animation="wave"
-                className="w-16! h-3.5! rounded! mb-2.5! dark:bg-gray-700/60!"
+                className="w-16! h-3.5! rounded! mb-2.5! dark:bg-gray-800/50!"
               />
               <div className="flex items-center gap-x-3">
                 {new Array(4).fill(0).map((_, index) => (
                   <Skeleton
                     variant="circular"
                     animation="wave"
-                    className="w-10! h-10! dark:bg-gray-700/60!"
+                    className="w-10! h-10! dark:bg-gray-800/50!"
                     key={index}
                   />
                 ))}
@@ -403,17 +430,17 @@ const Details = () => {
               <Skeleton
                 variant="circular"
                 animation="wave"
-                className="w-8! h-8! dark:bg-gray-700/60!"
+                className="w-8! h-8! dark:bg-gray-800/50!"
               />
               <Skeleton
                 variant="rounded"
                 animation="wave"
-                className="w-10! h-8! rounded-md! dark:bg-gray-700/60!"
+                className="w-10! h-8! rounded-md! dark:bg-gray-800/50!"
               />
               <Skeleton
                 variant="circular"
                 animation="wave"
-                className="w-8! h-8! dark:bg-gray-700/60!"
+                className="w-8! h-8! dark:bg-gray-800/50!"
               />
             </div>
           ) : (
@@ -467,7 +494,7 @@ const Details = () => {
             <Skeleton
               variant="rounded"
               animation="wave"
-              className="w-44! h-12! rounded-lg! mt-5! dark:bg-gray-700/60!"
+              className="w-44! h-12! rounded-lg! mt-5! dark:bg-gray-800/50!"
             />
           ) : (
             product && (
@@ -499,38 +526,37 @@ const Details = () => {
             <Skeleton
               variant="rounded"
               animation="wave"
-              className="w-48! h-6! rounded-md! mb-4! dark:bg-gray-700/60!"
+              className="w-48! h-6! rounded-md! mb-4! dark:bg-gray-800/50!"
             />
             <div className="space-y-2.5 max-w-4xl">
               <Skeleton
                 variant="rounded"
                 animation="wave"
-                className="w-full! h-4! rounded! dark:bg-gray-700/60!"
+                className="w-full! h-4! rounded! dark:bg-gray-800/50!"
               />
               <Skeleton
                 variant="rounded"
                 animation="wave"
-                className="w-11/12! h-4! rounded! dark:bg-gray-700/60!"
+                className="w-11/12! h-4! rounded! dark:bg-gray-800/50!"
               />
               <Skeleton
                 variant="rounded"
                 animation="wave"
-                className="w-4/5! h-4! rounded! dark:bg-gray-700/60!"
+                className="w-4/5! h-4! rounded! dark:bg-gray-800/50!"
               />
               <Skeleton
                 variant="rounded"
                 animation="wave"
-                className="w-3/5! h-4! rounded! dark:bg-gray-700/60!"
+                className="w-3/5! h-4! rounded! dark:bg-gray-800/50!"
               />
             </div>
           </div>
-
           {/* Reviews Header Skeleton */}
           <div className="mt-8">
             <Skeleton
               variant="rounded"
               animation="wave"
-              className="w-44! h-6! rounded-md! mb-6! dark:bg-gray-700/60!"
+              className="w-44! h-6! rounded-md! mb-6! dark:bg-gray-800/50!"
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-[1.5fr_3fr] gap-x-10 gap-y-5 items-start">
@@ -539,22 +565,22 @@ const Details = () => {
                 <Skeleton
                   variant="rounded"
                   animation="wave"
-                  className="w-16! h-10! rounded-md! dark:bg-gray-700/60!"
+                  className="w-16! h-10! rounded-md! dark:bg-gray-800/50!"
                 />
                 <Skeleton
                   variant="rounded"
                   animation="wave"
-                  className="w-32! h-5! rounded-md! dark:bg-gray-700/60!"
+                  className="w-32! h-5! rounded-md! dark:bg-gray-800/50!"
                 />
                 <Skeleton
                   variant="rounded"
                   animation="wave"
-                  className="w-40! h-4! rounded-md! dark:bg-gray-700/60!"
+                  className="w-40! h-4! rounded-md! dark:bg-gray-800/50!"
                 />
                 <Skeleton
                   variant="rounded"
                   animation="wave"
-                  className="w-full! h-10! rounded-md! mt-2! dark:bg-gray-700/60!"
+                  className="w-full! h-10! rounded-md! mt-2! dark:bg-gray-800/50!"
                 />
               </div>
 
@@ -563,44 +589,44 @@ const Details = () => {
                 {[1, 2, 3].map((item) => (
                   <div
                     key={item}
-                    className="py-5 bg-white dark:bg-gray-700/70 rounded-xl px-5 shadow-[0px_0px_10px_rgba(0,0,0,0.06)] border border-slate-100 dark:border-gray-600/50"
+                    className="py-5 bg-white dark:bg-gray-900 rounded-xl px-5 shadow-[0px_0px_10px_rgba(0,0,0,0.06)] border border-slate-100 dark:border-gray-600/50"
                   >
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-x-4">
                         <Skeleton
                           variant="circular"
                           animation="wave"
-                          className="w-12! h-12! dark:bg-gray-600/70!"
+                          className="w-12! h-12! dark:bg-gray-800/50!"
                         />
                         <div className="flex flex-col gap-y-1.5">
                           <Skeleton
                             variant="rounded"
                             animation="wave"
-                            className="w-32! h-4! rounded! dark:bg-gray-600/70!"
+                            className="w-32! h-4! rounded! dark:bg-gray-800/50!"
                           />
                           <Skeleton
                             variant="rounded"
                             animation="wave"
-                            className="w-20! h-3! rounded! dark:bg-gray-600/70!"
+                            className="w-20! h-3! rounded! dark:bg-gray-800/50!"
                           />
                         </div>
                       </div>
                       <Skeleton
                         variant="rounded"
                         animation="wave"
-                        className="w-24! h-4! rounded! dark:bg-gray-600/70!"
+                        className="w-24! h-4! rounded! dark:bg-gray-800/50!"
                       />
                     </div>
                     <div className="mt-4 space-y-2">
                       <Skeleton
                         variant="rounded"
                         animation="wave"
-                        className="w-full! h-3.5! rounded! dark:bg-gray-600/70!"
+                        className="w-full! h-3.5! rounded! dark:bg-gray-800/50!"
                       />
                       <Skeleton
                         variant="rounded"
                         animation="wave"
-                        className="w-4/5! h-3.5! rounded! dark:bg-gray-600/70!"
+                        className="w-4/5! h-3.5! rounded! dark:bg-gray-800/50!"
                       />
                     </div>
                   </div>
@@ -643,7 +669,13 @@ const Details = () => {
                   </p>
                   <button
                     className="py-2.5 bg-primary hover:opacity-90 active:scale-95 transition-all rounded-xl w-full text-white text-sm font-semibold mt-1 cursor-pointer"
-                    onClick={() => setShowAddReview(true)}
+                    onClick={() => {
+                      if (!user) {
+                        navigate("/signin");
+                      } else {
+                        setShowAddReview(true);
+                      }
+                    }}
                   >
                     Write a review
                   </button>
@@ -655,44 +687,44 @@ const Details = () => {
                     [1, 2, 3].map((item) => (
                       <div
                         key={item}
-                        className="py-5 bg-white dark:bg-gray-700/70 rounded-xl px-5 shadow-[0px_0px_10px_rgba(0,0,0,0.06)] border border-slate-100 dark:border-gray-600/50"
+                        className="py-5 bg-white dark:bg-gray-800/50 rounded-xl px-5 shadow-[0px_0px_10px_rgba(0,0,0,0.06)] border border-slate-100 dark:border-gray-600/50"
                       >
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-x-4">
                             <Skeleton
                               variant="circular"
                               animation="wave"
-                              className="w-12! h-12! dark:bg-gray-600/70!"
+                              className="w-12! h-12! dark:bg-gray-800/50!"
                             />
                             <div className="flex flex-col gap-y-1.5">
                               <Skeleton
                                 variant="rounded"
                                 animation="wave"
-                                className="w-32! h-4! rounded! dark:bg-gray-600/70!"
+                                className="w-32! h-4! rounded! dark:bg-gray-800/50!"
                               />
                               <Skeleton
                                 variant="rounded"
                                 animation="wave"
-                                className="w-20! h-3! rounded! dark:bg-gray-600/70!"
+                                className="w-20! h-3! rounded! dark:bg-gray-800/50!"
                               />
                             </div>
                           </div>
                           <Skeleton
                             variant="rounded"
                             animation="wave"
-                            className="w-24! h-4! rounded! dark:bg-gray-600/70!"
+                            className="w-24! h-4! rounded! dark:bg-gray-800/50!"
                           />
                         </div>
                         <div className="mt-4 space-y-2">
                           <Skeleton
                             variant="rounded"
                             animation="wave"
-                            className="w-full! h-3.5! rounded! dark:bg-gray-600/70!"
+                            className="w-full! h-3.5! rounded! dark:bg-gray-800/50!"
                           />
                           <Skeleton
                             variant="rounded"
                             animation="wave"
-                            className="w-4/5! h-3.5! rounded! dark:bg-gray-600/70!"
+                            className="w-4/5! h-3.5! rounded! dark:bg-gray-800/50!"
                           />
                         </div>
                       </div>
@@ -732,6 +764,23 @@ const Details = () => {
                     </p>
                   )}
                 </div>
+              </div>
+            </div>
+            <div className="dark:bg-gray-950 mt-10">
+              {similarProductsData &&
+                similarProductsData.products.length !== 0 && (
+                  <h1 className="my-5 text-2xl text-slate-700 font-medium dark:text-gray-300">
+                    You might also like
+                  </h1>
+                )}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-5 gap-y-5">
+                {similarProductsLoading
+                  ? new Array(5)
+                      .fill(0)
+                      .map((_, index) => <ProductCardSkeleton key={index} />)
+                  : similarProductsData.products.map((product: any) => (
+                      <ProductCard key={product.id} {...product} />
+                    ))}
               </div>
             </div>
           </div>

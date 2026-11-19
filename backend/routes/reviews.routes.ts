@@ -1,12 +1,12 @@
 import { Router } from "express";
-import authMiddleware from "../middlewares/auth.middleware";
+import authMiddleware from "../middlewares/auth.middleware.js";
 import {
   createReview,
   deleteReview,
   getReview,
   getReviews,
   updateReview,
-} from "../controllers/review.controller";
+} from "../controllers/review.controller.js";
 
 const reviewRouter = Router();
 

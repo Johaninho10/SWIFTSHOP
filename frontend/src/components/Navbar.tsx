@@ -26,6 +26,7 @@ type UI = {
 type User = {
   user: {
     firstname: string;
+    lastname: string
   };
 };
 
@@ -65,20 +66,11 @@ const Navbar = () => {
   const cartQuantity =
     cart.length === 0 ? 0 : cart.reduce((acc, item) => acc + item.quantity, 0);
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
-  const [navSearch, setNavSearch] = useState<string>("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [signOut] = useSignOutMutation();
-
-  const handleNavSearch = () => {
-    if (navSearch.trim()) {
-      navigate(`/search?q=${encodeURIComponent(navSearch.trim())}`);
-    } else {
-      navigate("/search");
-    }
-  };
 
   const handleSignOut = async () => {
     try {
@@ -103,8 +95,8 @@ const Navbar = () => {
   };
 
   return (
-    <header className="">
-      <div className="flex justify-between items-center px-2.5 md:px-[5%] lg:px-[10%] border-b border-slate-300 dark:border-slate-500 bg-secondary dark:bg-gray-800 transition-all duration-300">
+    <header className="h-[10vh] fixed z-10 top-0 left-0 right-0 ">
+      <div className="flex justify-between items-center px-2.5 md:px-[5%] lg:px-[10%] border-b border-slate-300 dark:border-slate-500 bg-white dark:bg-gray-950 backdrop-blur-sm  transition-all duration-300">
         <Link to={"/"}>
           <img
             src={theme === "dark" ? "/logo-white.png" : "/logo.png"}
@@ -113,32 +105,10 @@ const Navbar = () => {
           />
         </Link>
 
-        <div className="relative hidden sm:block">
-          <input
-            type="text"
-            value={navSearch}
-            onChange={(e) => setNavSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleNavSearch();
-              }
-            }}
-            className="py-2 pl-11 pr-4 border border-slate-400 dark:border-slate-600 dark:bg-slate-700/80 bg-[#F2F3FE] text-slate-800 dark:text-white rounded-lg w-85 md:w-90 lg:w-100 focus:ring-1 focus:ring-primary transition-all duration-300 outline-none"
-            placeholder="Search a product..."
-          />
-          <button
-            type="button"
-            onClick={handleNavSearch}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 dark:text-white hover:text-primary transition-colors cursor-pointer"
-          >
-            <Search size={18} />
-          </button>
-        </div>
-
         <div className="flex items-center space-x-3">
           <button
-            className="sm:hidden w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all cursor-pointer"
-            onClick={() => navigate("/search")}
+            className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all cursor-pointer"
+            onClick={() => navigate("/search?query=")}
             title="Search"
           >
             <Search className="" />
@@ -146,7 +116,13 @@ const Navbar = () => {
 
           <button
             className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all cursor-pointer"
-            onClick={() => navigate("/wishlist")}
+            onClick={() => {
+              if (!user) {
+                navigate("/signin");
+              } else {
+                navigate("/wishlist");
+              }
+            }}
           >
             <Heart className="" />
           </button>
@@ -182,7 +158,7 @@ const Navbar = () => {
                 role="button"
                 className="btn m-1 w-12 h-12 rounded-full flex justify-center items-center bg-primary text-white border-0 text-xl"
               >
-                {user.firstname[0].toUpperCase()}
+                {user.firstname[0].toUpperCase()}{user.lastname[0].toUpperCase()}
               </div>
               <ul
                 tabIndex={-1}
@@ -226,10 +202,12 @@ const Navbar = () => {
         className={`${showSidebar ? "max-sm:w-screen sm:w-0 sm:overflow-hidden" : "w-0 overflow-hidden"} fixed top-0 h-screen transition-all duration-300 z-1000`}
       >
         <div
-          className="bg-black/60 w-full h-full"
+          className="bg-black/60 backdrop-blur-sm w-full h-full"
           onClick={() => setShowSidebar(false)}
         ></div>
-        <div className="bg-white dark:bg-gray-800 absolute top-0 left-0 bottom-0 pt-10 px-4 w-60">
+        <div
+          className={`bg-white dark:bg-gray-800 absolute top-0 left-0 bottom-0 pt-10 px-4 transition-all ${showSidebar ? "w-60" : "w-0 overflow-hidden"}`}
+        >
           {user ? (
             <div className="bg-primary text-white w-15 h-15 rounded-full flex justify-center items-center">
               {user.firstname[0].toUpperCase()}

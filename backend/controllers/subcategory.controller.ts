@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
-import prisma from "../lib/prisma";
+import prisma from "../lib/prisma.js";
+import redis from "../lib/redis.js";
 
 // Get Sub Categories of a specific category
 
@@ -34,9 +35,9 @@ export const createSubCategory = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { categoryId, name }: { categoryId: string; name: string } = req.body;
 
-    if(!categoryId){
-      res.status(400)
-      throw new Error("The category id is required")
+    if (!categoryId) {
+      res.status(400);
+      throw new Error("The category id is required");
     }
 
     const category = await prisma.category.findUnique({
@@ -58,6 +59,19 @@ export const createSubCategory = asyncHandler(
         name: name.trim(),
       },
     });
+
+    if (category.isPopular) {
+      const popularCategories = await prisma.category.findMany({
+        where: {
+          isPopular: true,
+        },
+        include: {
+          subCategories: true
+        }
+      });
+
+      await redis.set("popular-categories", JSON.stringify(popularCategories));
+    }
 
     res.status(201).json({
       success: true,
@@ -96,6 +110,29 @@ export const updateSubCategory = asyncHandler(
       },
     });
 
+    const category = await prisma.category.findUnique({
+      where: {
+        id: subCategory.categoryId,
+      },
+    });
+
+    if (!category) {
+      throw new Error("Category not found");
+    }
+
+    if (category.isPopular) {
+      const popularCategories = await prisma.category.findMany({
+        where: {
+          isPopular: true,
+        },
+        include: {
+          subCategories: true
+        }
+      });
+
+      await redis.set("popular-categories", JSON.stringify(popularCategories));
+    }
+
     res.status(200).json({
       success: true,
       message: "Sub Ccategory updated successfully",
@@ -124,6 +161,32 @@ export const deleteSubCategory = asyncHandler(
         id: String(id),
       },
     });
+
+    const category = await prisma.category.findUnique({
+      where: {
+        id: subCategory.categoryId,
+      },
+      include: {
+        subCategories: true
+      }
+    });
+
+    if (!category) {
+      throw new Error("Category not found");
+    }
+
+    if (category.isPopular) {
+      const popularCategories = await prisma.category.findMany({
+        where: {
+          isPopular: true,
+        },
+        include: {
+          subCategories: true
+        }
+      });
+
+      await redis.set("popular-categories", JSON.stringify(popularCategories));
+    }
 
     res.status(200).json({
       success: true,

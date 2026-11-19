@@ -129,7 +129,7 @@ const ProductCard = (product: Product) => {
       whileInView={{ y: 0, opacity: 1 }}
       transition={{ duration: 1, ease: "easeInOut" }}
     >
-      <div className="bg-[#E6E9F2] rounded-lg overflow-hidden w-full h-40 md:h-50 flex justify-center items-center group relative">
+      <div className="bg-[#E6E9F2] dark:bg-gray-800 rounded-lg overflow-hidden w-full h-40 md:h-50 flex justify-center items-center group relative">
         <Link className="" to={`/product/${product.id}`}>
           <img
             src={product.images[0].url}
@@ -159,7 +159,7 @@ const ProductCard = (product: Product) => {
         <div className="flex justify-between">
           <BasicRating rate={product.rate} readOnly={true} />
           <p className="text-slate-500 dark:text-gray-300 text-sm">
-            {Number(product.rate).toFixed(2)} ({product.reviews})
+            {Number(product.rate).toFixed(1)} ({product.reviews})
           </p>
         </div>
         <p className="text-primary font-medium dark:text-white text-[18px]">

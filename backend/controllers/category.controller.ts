@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
-import cloudinary from "../lib/cloudinary";
-import prisma from "../lib/prisma";
-import redis from "../lib/redis";
+import cloudinary from "../lib/cloudinary.js";
+import prisma from "../lib/prisma.js";
+import redis from "../lib/redis.js";
 
 // Get all Categories
 
@@ -51,7 +51,22 @@ export const getCategory = asyncHandler(
 
 export const getPopularCategories = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const categories = String(await redis.get("popular-categories"));
+    let categories = await redis.get("popular-categories")
+    
+    if (!categories || categories === "null") {
+      categories = JSON.stringify(
+        await prisma.category.findMany({
+          where: {
+            isPopular: true,
+          },
+          include: {
+            subCategories: true,
+          },
+        }),
+      );
+    }
+
+    await redis.set("popular-categories", categories);
 
     res.status(200).json({
       success: true,

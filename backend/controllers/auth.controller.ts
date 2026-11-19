@@ -1,11 +1,11 @@
 import type { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
-import prisma from "../lib/prisma";
+import prisma from "../lib/prisma.js";
 import bcrypt from "bcryptjs";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import transporter from "../lib/nodemailer";
-import verficationEmail from "../emails/verification-email";
-import { User } from "../generated/prisma/client";
+import transporter from "../lib/nodemailer.js";
+import verficationEmail from "../emails/verification-email.js";
+import { User } from "../generated/prisma/client.js";
 
 declare global {
   namespace Express {

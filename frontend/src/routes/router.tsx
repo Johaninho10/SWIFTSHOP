@@ -8,6 +8,7 @@ import ProtectedRoutes from "../pages/ProtectedRoutes";
 import WishList from "../pages/WishList";
 import Cart from "../pages/Cart";
 import Details from "../pages/Details";
+import Search from "../pages/Search";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: "/product/:id",
         element: <Details />,
+      },
+      {
+        path: "/search",
+        element: <Search />,
       },
       {
         path: "",

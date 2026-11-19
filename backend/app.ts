@@ -2,14 +2,14 @@ import express from "express";
 import "dotenv/config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import errorMiddleware from "./middlewares/error.middleware";
-import authRouter from "./routes/auth.routes";
-import userRouter from "./routes/user.routes";
-import categoryRouter from "./routes/category.routes";
-import subCategoryRouter from "./routes/subcategory.routes";
-import productRouter from "./routes/product.routes";
-import cartRouter from "./routes/cart.routes";
-import reviewRouter from "./routes/reviews.routes";
+import errorMiddleware from "./middlewares/error.middleware.js";
+import authRouter from "./routes/auth.routes.js";
+import userRouter from "./routes/user.routes.js";
+import categoryRouter from "./routes/category.routes.js";
+import subCategoryRouter from "./routes/subcategory.routes.js";
+import productRouter from "./routes/product.routes.js";
+import cartRouter from "./routes/cart.routes.js";
+import reviewRouter from "./routes/reviews.routes.js";
 
 // Creating express server
 const app = express();

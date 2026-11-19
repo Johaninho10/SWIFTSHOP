@@ -4,6 +4,9 @@ import asyncHandler from "express-async-handler";
 const adminMiddleware = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { user } = req;
+    if(!user){
+      throw new Error()
+    }
     if (user.role !== "ADMIN") {
       throw new Error("Not authorized");
     }

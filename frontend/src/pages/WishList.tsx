@@ -28,7 +28,7 @@ const WishList = () => {
   const { data, isLoading }: { data: Data; isLoading: boolean } =
     useGetWishlistQuery(null);
   return (
-    <div className="w-screen min-h-screen dark:bg-gray-800">
+    <div className="w-screen min-h-screen dark:bg-gray-950 pt-[10vh]">
       <Navbar />
       <div className="pt-10 px-5 md:px-[5%] lg:px-[10%]">
         <h1 className="text-3xl text-slate-700 dark:text-gray-300 font-medium mb-2">

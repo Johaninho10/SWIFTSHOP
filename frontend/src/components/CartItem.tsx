@@ -52,6 +52,9 @@ const CartItem = (item: CartItem) => {
         color: item.color,
       }).unwrap();
 
+      console.log(result.success);
+      
+
       if (!result.success) {
         throw new Error(result.message);
       }

@@ -44,7 +44,7 @@ const Cart = () => {
   const total = subtotal + serviceFee;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 pt-[10vh]">
       <Navbar />
 
       {cart.length === 0 ? (
@@ -76,8 +76,8 @@ const Cart = () => {
             <h1 className="text-2xl font-bold text-slate-800 dark:text-gray-100">
               Your Cart
             </h1>
-            <span className="inline-flex items-center justify-center min-w-[1.75rem] h-7 px-2 rounded-full bg-primary text-white text-xs font-semibold">
-              {cart.length}
+            <span className="inline-flex items-center justify-center min-w-7 h-7 px-2 rounded-full bg-primary text-white text-xs font-semibold">
+              {cart.reduce((acc, item) => acc + item.quantity, 0)}
             </span>
           </div>
 

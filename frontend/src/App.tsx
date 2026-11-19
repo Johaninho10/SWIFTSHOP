@@ -57,7 +57,7 @@ const App = () => {
   }, [theme]);
 
   return isLoading || cartLoading ? (
-    <div className="w-screen h-screen flex justify-center items-center bg-secondary dark:bg-gray-800">
+    <div className="w-screen h-screen flex justify-center items-center bg-secondary dark:bg-gray-950">
       <motion.img
         src={theme === "dark" ? "/logo-white.png" : "/logo.png"}
         alt="logo"

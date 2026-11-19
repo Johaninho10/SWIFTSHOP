@@ -1,7 +1,7 @@
 import { Router } from "express";
-import authMiddleware from "../middlewares/auth.middleware";
-import adminMiddleware from "../middlewares/admin.middleware";
-import upload from "../lib/multer";
+import authMiddleware from "../middlewares/auth.middleware.js";
+import adminMiddleware from "../middlewares/admin.middleware.js";
+import upload from "../lib/multer.js";
 import {
   createCategory,
   deleteCategory,
@@ -10,7 +10,7 @@ import {
   getPopularCategories,
   togglePopularity,
   updateCategory,
-} from "../controllers/category.controller";
+} from "../controllers/category.controller.js";
 
 const categoryRouter = Router();
 

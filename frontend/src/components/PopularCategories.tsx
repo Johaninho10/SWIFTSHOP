@@ -23,7 +23,7 @@ const PopularCategories = () => {
   const nextEl = useRef<HTMLButtonElement>(null);
 
   return (
-    <div className="px-5 md:px-[5%] lg:px-[10%] dark:bg-gray-800">
+    <div className="px-5 md:px-[5%] lg:px-[10%] dark:bg-gray-950">
       <h1 className="text-2xl font-medium text-slate-700 dark:text-gray-200">
         Popular Categories
       </h1>
@@ -79,7 +79,7 @@ const PopularCategories = () => {
                   <Skeleton
                     variant="rectangular"
                     animation="wave"
-                    className="w-full! h-50! rounded-2xl!"
+                    className="w-full! h-50! rounded-2xl! dark:bg-gray-800/50!"
                   />
                 </SwiperSlide>
               ))
@@ -99,7 +99,7 @@ const PopularCategories = () => {
                       alt=""
                       className="w-50 aspect-square object-cover mx-auto group-hover:scale-105 transition-all duration-300"
                     />
-                    <div className="absolute left-0 right-0 top-0 bottom-0 bg-black/20">
+                    <div className="absolute left-0 right-0 top-0 bottom-0 bg-black/20 0">
                       <div className="absolute bottom-5 left-10 text-white text-xl font-medium transition-all">
                         {category.name}
                       </div>

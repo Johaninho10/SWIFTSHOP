@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
-import prisma from "../lib/prisma";
+import prisma from "../lib/prisma.js";
 import jwt, {JwtPayload} from "jsonwebtoken";
-import { User } from "../generated/prisma/client";
+import { User } from "../generated/prisma/client.js";
 
 
 

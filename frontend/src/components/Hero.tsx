@@ -10,18 +10,18 @@ const Hero = () => {
   const prevEl = useRef<HTMLButtonElement>(null);
   const nextEl = useRef<HTMLButtonElement>(null);
   return (
-    <div className="px-5 md:px-[5%] lg:px-[10%] bg-secondary dark:bg-gray-800 py-10 transition-all">
+    <div className="px-5 md:px-[5%] lg:px-[10%] bg-secondary dark:bg-gray-950 py-10 transition-all">
       <div className="relative">
         <button
           ref={prevEl}
-          className="bg-primary text-white w-10 h-10 rounded-full flex justify-center items-center absolute top-1/2 left-5 z-10"
+          className="bg-primary text-white w-10 h-10 rounded-full flex justify-center items-center absolute top-1/2 left-5 z-5"
         >
           <ChevronLeft />
         </button>
 
         <button
           ref={nextEl}
-          className="bg-primary text-white w-10 h-10 rounded-full flex justify-center items-center absolute top-1/2 right-5 z-10"
+          className="bg-primary text-white w-10 h-10 rounded-full flex justify-center items-center absolute top-1/2 right-5 z-5"
         >
           <ChevronRight />
         </button>
@@ -50,9 +50,9 @@ const Hero = () => {
           modules={[Autoplay, Pagination, Navigation]}
           className="mySwiper"
         >
-          <SwiperSlide className="flex! flex-col-reverse md:flex-row items-center justify-between bg-[#E6E9F2] py-8 md:px-20 px-5 mt-6 rounded-xl min-w-full">
+          <SwiperSlide className="flex! flex-col-reverse md:flex-row items-center justify-between bg-[#E6E9F2] dark:bg-gray-800 py-8 md:px-20 px-5 mt-6 rounded-xl min-w-full">
             <div className="flex flex-col space-y-4">
-              <h1 className="max-w-lg md:text-[40px] md:leading-12 text-2xl font-semibold text-slate-700 max-md:text-center">
+              <h1 className="max-w-lg md:text-[40px] md:leading-12 text-2xl font-semibold text-slate-700 dark:text-white max-md:text-center">
                 Experience Pure Sound - Your Perfect Headphones Awaits
               </h1>
               <button className="bg-primary text-white py-3 rounded-md px-8 self-start mt-5">
@@ -67,9 +67,9 @@ const Hero = () => {
             />
           </SwiperSlide>
 
-          <SwiperSlide className="flex! flex-col-reverse md:flex-row items-center justify-between bg-[#E6E9F2] py-8 md:px-20 px-5 mt-6 rounded-xl min-w-full">
+          <SwiperSlide className="flex! flex-col-reverse md:flex-row items-center justify-between bg-[#E6E9F2] dark:bg-gray-800 py-8 md:px-20 px-5 mt-6 rounded-xl min-w-full">
             <div className="flex flex-col space-y-4">
-              <h1 className="max-w-lg md:text-[40px] md:leading-12 text-2xl font-semibold text-slate-700 max-md:text-center">
+              <h1 className="max-w-lg md:text-[40px] md:leading-12 text-2xl font-semibold text-slate-700 dark:text-white max-md:text-center">
                 Next-Level Gaming Starts Here - Discover PlayStation 5 Today!
               </h1>
               <button className="bg-primary text-white py-3 rounded-md px-8 self-start mt-5">
@@ -84,9 +84,9 @@ const Hero = () => {
             />
           </SwiperSlide>
 
-          <SwiperSlide className="flex! flex-col-reverse md:flex-row items-center justify-between bg-[#E6E9F2] py-8 md:px-20 px-5 mt-6 rounded-xl min-w-full">
+          <SwiperSlide className="flex! flex-col-reverse md:flex-row items-center justify-between bg-[#E6E9F2] dark:bg-gray-800 py-8 md:px-20 px-5 mt-6 rounded-xl min-w-full">
             <div className="flex flex-col space-y-4">
-              <h1 className="max-w-lg md:text-[40px] md:leading-12 text-2xl font-semibold text-slate-700 max-md:text-center">
+              <h1 className="max-w-lg md:text-[40px] md:leading-12 text-2xl font-semibold text-slate-700 dark:text-white max-md:text-center">
                 Power Meets Elegance - Apple MacBook Pro is Here for you!
               </h1>
               <button className="bg-primary text-white py-3 rounded-md px-8 self-start mt-5">

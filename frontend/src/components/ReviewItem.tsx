@@ -52,7 +52,7 @@ const ReviewItem = ({
       whileInView={{ y: 0, opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="bg-white dark:bg-gray-700 rounded-2xl px-5 py-5 shadow-sm border border-slate-100 dark:border-gray-700"
+      className="bg-white dark:bg-gray-900 rounded-2xl px-5 py-5 shadow-sm border border-slate-100 dark:border-gray-700"
       key={review.id}
     >
       <div className="flex justify-between items-start gap-x-3">
@@ -109,7 +109,7 @@ const ReviewItem = ({
       <p className="text-slate-500 dark:text-gray-400 mt-4 text-sm max-w-[80%] wrap-break-word">
         {review.text.length <= 60 || showMore ? review.text : review.text.slice(0, 60)}
         {review.text.length > 60 && (
-          <span className="text-primary font-medium cursor-pointer" onClick={() => setShowMore(true)}>...See more</span>
+          <span className="text-primary font-medium cursor-pointer" onClick={() => setShowMore(!showMore)}>...Show {showMore ? "less" : "more"}</span>
         )}
       </p>
     </motion.div>

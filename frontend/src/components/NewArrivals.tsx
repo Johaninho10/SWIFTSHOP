@@ -28,7 +28,7 @@ const NewArrivals = () => {
     useGetNewArrivalsQuery(null);
 
   return (
-    <div className="px-5 md:px-[5%] lg:px-[10%] dark:bg-gray-800 pt-5 pb-20">
+    <div className="px-5 md:px-[5%] lg:px-[10%] dark:bg-gray-950 pt-5 pb-20">
       <h1 className="text-2xl font-medium text-slate-700 dark:text-gray-200">
         New Arrivals
       </h1>
@@ -49,21 +49,9 @@ const NewArrivals = () => {
           data.products.map((product) => (
             <ProductCard key={product.id} {...product} />
           ))}
-        {data &&
-          data.success &&
-          data.products.map((product) => (
-            <ProductCard key={product.id} {...product} />
-          ))}
-        {data &&
-          data.success &&
-          data.products.map((product) => (
-            <ProductCard key={product.id} {...product} />
-          ))}
-        {data &&
-          data.success &&
-          data.products.map((product) => (
-            <ProductCard key={product.id} {...product} />
-          ))}
+
+
+        
       </div>
     </div>
   );
