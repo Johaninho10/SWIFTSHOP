@@ -10,6 +10,7 @@ import subCategoryRouter from "./routes/subcategory.routes.js";
 import productRouter from "./routes/product.routes.js";
 import cartRouter from "./routes/cart.routes.js";
 import reviewRouter from "./routes/reviews.routes.js";
+import type { Request, Response } from "express";
 
 // Creating express server
 const app = express();
@@ -26,6 +27,11 @@ app.use(
 app.use(cookieParser());
 
 // Routes
+
+app.get("/", async (req: Request, res: Response) => {
+  res.status(200).send("API IS LIVE!!!");
+});
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/category", categoryRouter);
