@@ -1,32 +1,17 @@
 import { MuiOtpInput } from "mui-one-time-password-input";
 
-type args = {
+type Args = {
   otp: string;
   changeOtp: (otp: string) => void;
 };
 
-const OTP = ({ otp, changeOtp }: args) => {
-  const matchIsString = (text: string) => {
-    return typeof text === "string" && text.trim();
-  };
-
-  function matchIsNumeric(text: string) {
-    const isNumber = typeof text === "number";
-    const isString = matchIsString(text);
-    return (isNumber || (isString && text !== "")) && !isNaN(Number(text));
-  }
-
-  const validateChar = (value: string) => {
-    return matchIsNumeric(value);
-  };
-  const handleChange = (newValue: string) => {
-    changeOtp(newValue);
-  };
+const OTP = ({ otp, changeOtp }: Args) => {
+  const validateChar = (character: string): boolean => /^\d$/.test(character);
 
   return (
     <MuiOtpInput
       value={otp}
-      onChange={handleChange}
+      onChange={changeOtp}
       length={6}
       validateChar={validateChar}
     />

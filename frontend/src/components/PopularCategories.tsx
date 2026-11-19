@@ -9,8 +9,6 @@ import Skeleton from "@mui/material/Skeleton";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
-
-
 type Category = {
   id: string;
   image: string;

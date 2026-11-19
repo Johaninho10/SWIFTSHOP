@@ -38,7 +38,7 @@ const Hero = () => {
             clickable: true,
           }}
             onBeforeInit={(swiper) => {
-            if (typeof swiper.params.navigation !== "boolean") {
+            if (swiper.params.navigation && typeof swiper.params.navigation !== "boolean") {
               swiper.params.navigation.prevEl = prevEl.current;
               swiper.params.navigation.nextEl = nextEl.current;
             }

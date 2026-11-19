@@ -1,17 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import BasicRating from "./BasicRating";
 import { useState } from "react";
-import { ShoppingCart, Heart } from "lucide-react";
 import { useToggleWishMutation } from "../app/services/products";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { motion } from "motion/react";
-import {
-  useAddToCartMutation,
-  useUpdateCartMutation,
-} from "../app/services/cart";
-import { Loader } from "lucide-react";
-import { setCart } from "../app/features/cart";
+
+import { Heart } from "lucide-react";
 
 type Image = {
   url: string;
@@ -48,19 +43,12 @@ type Store = {
 };
 
 const ProductCard = (product: Product) => {
-  const [quantity, setQuantity] = useState<number>(1);
   const [saved, setSaved] = useState<boolean>(product.saved);
-
-  const [addToCart, { isLoading: addToCartLoading }] = useAddToCartMutation();
-  const [updateCart, { isLoading: updateCartLoading }] =
-    useUpdateCartMutation();
 
   const [toggleWish, { isLoading }] = useToggleWishMutation();
 
   const user = useSelector((store: Store) => store.user.user);
-  const cart = useSelector((store: Store) => store.cart.cart);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleToggleWish = async () => {
     try {
@@ -75,50 +63,6 @@ const ProductCard = (product: Product) => {
         throw new Error();
       }
     } catch (error) {
-      toast.error("Something went wrong");
-    }
-  };
-
-  const handleAddToCart = async () => {
-    try {
-      const cartItem = cart.find((item) => item.product.id === product.id);
-
-      if (!cartItem) {
-        const result = await addToCart({
-          productId: product.id,
-          quantity,
-        }).unwrap();
-
-        if (!result.success) {
-          throw new Error(result.message);
-        }
-        dispatch(setCart([...cart, result.cartItem]));
-      } else {
-        const result = await updateCart({
-          productId: product.id,
-          quantity: quantity + cartItem.quantity,
-        }).unwrap();
-
-        if (!result.success) {
-          throw new Error(result.message);
-        }
-
-        let cartCopy = [...cart];
-
-        cartCopy = cartCopy.map((item) => {
-          if (item.product.id === cartItem.product.id) {
-            return { ...item, quantity: quantity + item.quantity };
-          }
-          return item;
-        });
-
-        dispatch(setCart(cartCopy));
-      }
-
-      toast.success("Added to Cart");
-    } catch (error) {
-      console.log(error);
-
       toast.error("Something went wrong");
     }
   };
