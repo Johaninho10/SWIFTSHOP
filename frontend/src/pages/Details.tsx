@@ -10,14 +10,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation, Autoplay } from "swiper/modules";
-import {
-  Check,
-  Heart,
-  ShoppingCart,
-  Loader,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Check, Heart, ShoppingCart, Loader } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import {
@@ -130,8 +123,6 @@ const Details = () => {
 
   const [selectedReview, setSelectedReview] = useState("");
   const [showAllReviews, setShowAllReviews] = useState(false);
-  const prevEl = useRef<HTMLButtonElement>(null);
-  const nextEl = useRef<HTMLButtonElement>(null);
 
   const [addToCart, { isLoading: addToCartLoading }] = useAddToCartMutation();
   const [updateCart, { isLoading: updateCartLoading }] =
