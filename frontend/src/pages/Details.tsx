@@ -4,7 +4,7 @@ import {
   useGetProductQuery,
   useGetSimilarProductsQuery,
 } from "../app/services/products";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
