@@ -2,6 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/api/v1/:path",
+      "destination": "https://swiftshop-swart.vercel.app/api/v1/:path"
+    }
+    ,
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
