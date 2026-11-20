@@ -32,6 +32,13 @@ app.get("/", async (req: Request, res: Response) => {
   res.status(200).send("API IS LIVE!!!");
 });
 
+app.use("/api/v1", (_req, res, next) => {
+  res.setHeader("Cache-Control", "private, no-store");
+  res.setHeader("Vercel-CDN-Cache-Control", "no-store");
+  res.setHeader("X-Backend-Reached", "true");
+  next();
+});
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/category", categoryRouter);

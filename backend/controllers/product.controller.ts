@@ -41,9 +41,7 @@ export const getProducts = asyncHandler(
       { query?: string; category?: string; subCategory?: string; page?: string }
     >,
     res: Response,
-  ) => {
-    res.setHeader("Cache-Control", "private, no-store");
-    const { query, category, subCategory, page = "1" } = req.query;
+  ) => {    const { query, category, subCategory, page = "1" } = req.query;
 
     const where: any = {};
 
