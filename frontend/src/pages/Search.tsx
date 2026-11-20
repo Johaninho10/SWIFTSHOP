@@ -9,7 +9,6 @@ import {
   SlidersHorizontal,
   RotateCcw,
   PackageSearch,
-  Sparkles,
 } from "lucide-react";
 import Skeleton from "@mui/material/Skeleton";
 import Pagination from "@mui/material/Pagination";
