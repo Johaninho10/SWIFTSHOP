@@ -8,7 +8,7 @@ const userApi = createApi({
   tagTypes: ["Wishlist"],
   endpoints: (build) => ({
     getUser: build.query({
-      query: () => "/",
+      query: () => "",
     }),
     getWishlist: build.query({
       query: () => "/wishlist",

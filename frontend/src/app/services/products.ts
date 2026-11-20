@@ -36,7 +36,7 @@ const productsApi = createApi({
 
         searchParams.append("page", page.toString());
 
-        return "/?" + searchParams.toString();
+        return "?" + searchParams.toString();
       },
       providesTags: ["Products"],
     }),
