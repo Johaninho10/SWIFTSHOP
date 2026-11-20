@@ -1,28 +1,24 @@
 import type { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
 import prisma from "../lib/prisma.js";
-import jwt, {JwtPayload} from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { User } from "../generated/prisma/client.js";
-
-
-
 
 declare global {
   namespace Express {
     interface Request {
-      user?: User
+      user?: User;
     }
   }
 }
 
 interface AuthPayload extends JwtPayload {
-  userId: string
+  userId: string;
 }
 
 interface CartPayload extends JwtPayload {
   cartId: string;
 }
-
 
 // Get User informations
 
@@ -30,8 +26,8 @@ export const getUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { user } = req;
 
-    if(!user){
-      throw new Error()
+    if (!user) {
+      throw new Error();
     }
     const result = {
       id: user.id,
@@ -39,6 +35,9 @@ export const getUser = asyncHandler(
       lastname: user.lastname,
       email: user.email,
     };
+
+    res.setHeader("Cache-Control", "private, no-store");
+
     res.status(200).json({
       success: true,
       user: result,
@@ -50,8 +49,8 @@ export const getWishList = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { user } = req;
 
-    if(!user){
-      throw new Error()
+    if (!user) {
+      throw new Error();
     }
 
     let wishList = await prisma.wish.findMany({
@@ -90,7 +89,7 @@ export const getWishList = asyncHandler(
 
     const products: any = wishList
       .map((wish) => wish.product)
-      .map((product : any) => {
+      .map((product: any) => {
         const reviewGroup = reviewsGroup.find(
           (item) => item.productId === product.id,
         );
@@ -114,7 +113,10 @@ export const getCart = asyncHandler(
     let cartId;
 
     if (token) {
-      const { userId } = jwt.verify(token, String(process.env.JWT_SECRET_KEY)) as AuthPayload;
+      const { userId } = jwt.verify(
+        token,
+        String(process.env.JWT_SECRET_KEY),
+      ) as AuthPayload;
       const user = await prisma.user.findUnique({
         where: {
           id: userId,
@@ -128,8 +130,11 @@ export const getCart = asyncHandler(
       const { cartToken } = req.cookies;
       if (!cartToken) {
         throw new Error("Cart token missing");
-      }      
-      ({ cartId } = jwt.verify(cartToken, String(process.env.JWT_SECRET_KEY)) as CartPayload);
+      }
+      ({ cartId } = jwt.verify(
+        cartToken,
+        String(process.env.JWT_SECRET_KEY),
+      ) as CartPayload);
     }
 
     const cart = (
@@ -150,13 +155,12 @@ export const getCart = asyncHandler(
                 },
               },
               quantity: true,
-              color: true
+              color: true,
             },
           },
         },
       })
     )?.cartItems;
-    
 
     if (!cart) {
       throw new Error("Cart not found");

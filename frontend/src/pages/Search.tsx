@@ -452,9 +452,7 @@ const Search = () => {
                     strokeWidth={1.5}
                   />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
-                </div>
+                
               </div>
 
               <h2 className="text-2xl font-bold text-slate-800 dark:text-gray-100 mb-2">

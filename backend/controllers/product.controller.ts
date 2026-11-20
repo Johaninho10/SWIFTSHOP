@@ -203,6 +203,9 @@ export const getProducts = asyncHandler(
 
     const totalPages = Math.ceil(total / take);
 
+    res.setHeader("Cache-Control", "private, no-store");
+
+
     res.status(200).json({
       success: true,
       products,
