@@ -4,11 +4,25 @@
     {
       "source": "/api/v1/:path*",
       "destination": "https://swiftshop-swart.vercel.app/api/v1/:path*"
-    }
-    ,
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/v1/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        },
+        {
+          "key": "Vercel-CDN-Cache-Control",
+          "value": "no-store"
+        }
+      ]
     }
   ]
 }
