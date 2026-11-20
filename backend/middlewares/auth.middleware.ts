@@ -11,6 +11,7 @@ interface AuthPayload extends JwtPayload {
 const authMiddleware = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { token } = req.cookies;
+    res.setHeader("Cache-Control", "private, no-store");
 
     if (!token) {
       throw new Error("No token provided!");

@@ -42,6 +42,7 @@ export const getProducts = asyncHandler(
     >,
     res: Response,
   ) => {
+    res.setHeader("Cache-Control", "private, no-store");
     const { query, category, subCategory, page = "1" } = req.query;
 
     const where: any = {};
@@ -203,7 +204,6 @@ export const getProducts = asyncHandler(
 
     const totalPages = Math.ceil(total / take);
 
-    res.setHeader("Cache-Control", "private, no-store");
 
 
     res.status(200).json({
