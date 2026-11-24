@@ -1,10 +1,10 @@
 import Rating from "@mui/material/Rating";
 import { useState } from "react";
 import { useCreateReviewsMutation } from "../app/services/reviews";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { Loader, X } from "lucide-react";
-import {motion} from "motion/react"
+import { motion } from "motion/react";
 
 const AddReview = ({
   changeAddReview,
@@ -18,6 +18,9 @@ const AddReview = ({
 
   const handleCreateReview = async () => {
     try {
+      if (!text.trim()) {
+        throw new Error("The text of the review is required");
+      }
       const result = await createReview({ text, rate, productId: id }).unwrap();
 
       if (result.success) {
@@ -61,7 +64,9 @@ const AddReview = ({
 
         {/* Rating */}
         <div className="flex items-center gap-x-3 mb-4">
-          <p className="text-sm text-slate-500 dark:text-gray-400 font-medium">Rating</p>
+          <p className="text-sm text-slate-500 dark:text-gray-400 font-medium">
+            Rating
+          </p>
           <Rating
             name="half-rating"
             defaultValue={rate}

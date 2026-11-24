@@ -1,8 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
   provider = "prisma-client"
@@ -10,12 +9,11 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
 }
 
 model PendingUser {
-  id                       String   @id @default(auto()) @map("_id") @db.ObjectId
+  id                       String   @id @default(uuid()) @db.Uuid
   firstname                String
   lastname                 String
   email                    String   @unique
@@ -27,7 +25,7 @@ model PendingUser {
 }
 
 model User {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  id                String   @id @default(uuid()) @db.Uuid
   firstname         String
   lastname          String
   email             String   @unique
@@ -40,65 +38,63 @@ model User {
   updatedAt         DateTime @default(now()) @updatedAt
   wishes            Wish[]
   cart              Cart?    @relation(fields: [cartId], references: [id])
-  cartId            String?  @unique @db.ObjectId
+  cartId            String?  @unique @db.Uuid
   reviews           Review[]
+  orders            Order[]
 }
 
 model Category {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  id            String        @id @default(uuid()) @db.Uuid
   name          String        @unique
   image         String
   subCategories SubCategory[]
-  productsIDs   String[]      @db.ObjectId
-  products      Product[]     @relation(fields: [productsIDs], references: [id])
+  productsIDs   String[]      @db.Uuid
   isPopular     Boolean       @default(false)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @default(now()) @updatedAt
 }
 
 model SubCategory {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  name        String    @unique
-  categoryId  String    @db.ObjectId
-  category    Category  @relation(fields: [categoryId], references: [id])
-  productsIDs String[]  @db.ObjectId
-  products    Product[] @relation(fields: [productsIDs], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now()) @updatedAt
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  categoryId  String   @db.Uuid
+  category    Category @relation(fields: [categoryId], references: [id])
+  productsIDs String[] @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
 
   @@unique([name, categoryId])
 }
 
 model Product {
-  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  id               String      @id @default(uuid()) @db.Uuid
   title            String
   description      String
   price            Int
   brand            String
   colors           String[]
   images           Image[]
-  categoriesIDs    String[]      @db.ObjectId
-  categories       Category[]    @relation(fields: [categoriesIDs], references: [id])
-  subCategoriesIDs String[]      @db.ObjectId
-  subCategories    SubCategory[] @relation(fields: [subCategoriesIDs], references: [id])
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @default(now()) @updatedAt
+  categoriesIDs    String[]    @db.Uuid
+  subCategoriesIDs String[]    @db.Uuid
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @default(now()) @updatedAt
   wishes           Wish[]
   cartItems        CartItems[]
   reviews          Review[]
+  orderItems       OrderItem[]
 }
 
 model Image {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  id        String  @id @default(uuid()) @db.Uuid
   url       String
-  productId String  @db.ObjectId
+  productId String  @db.Uuid
   product   Product @relation(fields: [productId], references: [id])
 }
 
 model Wish {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  productId String   @db.ObjectId
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  productId String   @db.Uuid
   user      User     @relation(fields: [userId], references: [id])
   product   Product  @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now())
@@ -108,7 +104,7 @@ model Wish {
 }
 
 model Cart {
-  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  id        String      @id @default(uuid()) @db.Uuid
   user      User?
   cartItems CartItems[]
   createdAt DateTime    @default(now())
@@ -116,9 +112,9 @@ model Cart {
 }
 
 model CartItems {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  cartId    String   @db.ObjectId
-  productId String   @db.ObjectId
+  id        String   @id @default(uuid()) @db.Uuid
+  cartId    String   @db.Uuid
+  productId String   @db.Uuid
   quantity  Int
   color     String
   cart      Cart     @relation(fields: [cartId], references: [id])
@@ -130,9 +126,9 @@ model CartItems {
 }
 
 model Review {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  productId String   @db.ObjectId
-  userId    String   @db.ObjectId
+  id        String   @id @default(uuid()) @db.Uuid
+  productId String   @db.Uuid
+  userId    String   @db.Uuid
   rate      Float
   text      String
   product   Product  @relation(fields: [productId], references: [id])
@@ -141,7 +137,53 @@ model Review {
   updatedAt DateTime @default(now()) @updatedAt
 }
 
+model Order {
+  id         String      @id @default(uuid()) @db.Uuid
+  userId     String      @db.Uuid
+  status     OrderStatus @default(PENDING)
+  user       User        @relation(fields: [userId], references: [id])
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @default(now())
+  orderItems OrderItem[]
+  payment    Payment?
+}
+
+model OrderItem {
+  id        String   @id @default(uuid()) @db.Uuid
+  productId String   @db.Uuid
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  color     String
+  orderId   String   @db.Uuid
+  order     Order    @relation(fields: [orderId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Payment {
+  id        String        @id @default(uuid()) @db.Uuid
+  reference String        @unique @default(uuid())
+  amount    Int
+  status    PaymentStatus
+  orderId   String        @unique @db.Uuid
+  order     Order         @relation(fields: [orderId], references: [id])
+}
+
 enum Role {
   CUSTOMER
   ADMIN
+}
+
+enum OrderStatus {
+  CANCELLED
+  PENDING
+  SHIPPING
+  DELIVERED
+}
+
+enum PaymentStatus {
+  CANCELLED
+  SUCCESS
+  PENDING
+  FAILURE
 }

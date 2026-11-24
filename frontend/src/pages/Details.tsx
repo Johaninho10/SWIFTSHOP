@@ -10,9 +10,9 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation, Autoplay } from "swiper/modules";
-import { Check, Heart, ShoppingCart, Loader } from "lucide-react";
+import { Check, Heart, ShoppingCart, Loader, Minus, Plus } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import {
   useAddToCartMutation,
   useUpdateCartMutation,
@@ -49,7 +49,7 @@ type Product = {
 
 type Data = {
   success: boolean;
-  message?: boolean;
+  message: string;
   product?: Product;
 };
 
@@ -74,6 +74,42 @@ type Store = {
   user: User;
 };
 
+const getBlurredUrl = (src?: string, width = 100) => {
+  if (!src) return "";
+  if (src.includes("e_blur")) return src;
+  return src.includes("/upload")
+    ? src.replace("/upload", `/upload/w_${width},q_auto,e_blur:500`)
+    : src;
+};
+
+const ThumbnailImage = ({ url }: { url: string }) => {
+  const [thumbUrl, setThumbUrl] = useState<string>(() => getBlurredUrl(url, 60));
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    setThumbUrl(getBlurredUrl(url, 60));
+    setLoading(true);
+  }, [url]);
+
+  return (
+    <img
+      src={thumbUrl || url}
+      alt="Thumbnail"
+      className={`h-20 md:h-24 w-8/10 mx-auto object-contain transition-all duration-300 ${
+        loading ? "blur-xs scale-95 opacity-80" : "blur-0 scale-100 opacity-100"
+      }`}
+      loading="lazy"
+      onLoad={() => {
+        if (url && thumbUrl !== url) {
+          setThumbUrl(url);
+        } else {
+          setLoading(false);
+        }
+      }}
+    />
+  );
+};
+
 const Details = () => {
   const { id } = useParams();
   const [quantity, setQuantity] = useState("1");
@@ -85,16 +121,26 @@ const Details = () => {
     data,
     isLoading,
     error,
-  }: { data: Data; isLoading: boolean; error: Error } = useGetProductQuery(id);
+  }: { data: Data; isLoading: boolean; error: Error; isFetching: boolean } =
+    useGetProductQuery(id);
 
   const { data: similarProductsData, isLoading: similarProductsLoading } =
     useGetSimilarProductsQuery(id);
 
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>();
+  const [mainImageUrl, setMainImageUrl] = useState<string | undefined>(undefined);
+  const [mainImageLoading, setMainImageLoading] = useState<boolean>(true);
   const [selectedColor, setSelectedColor] = useState<string>();
   const [saved, setSaved] = useState(false);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (selectedImage) {
+      setMainImageLoading(true);
+      setMainImageUrl(getBlurredUrl(selectedImage, 150));
+    }
+  }, [selectedImage]);
 
   const cart = useSelector((store: Store) => store.cart.cart);
   const user = useSelector((store: Store) => store.user.user);
@@ -112,6 +158,7 @@ const Details = () => {
       const result = await toggleWish({ productId: product?.id }).unwrap();
 
       if (result.success) {
+        toast.success(saved ? "Removed from wish list" : "Added to wishlist");
         setSaved(!saved);
       } else {
         throw new Error();
@@ -190,6 +237,8 @@ const Details = () => {
     }
   }, [data, isLoading]);
 
+
+
   return (
     <div className="min-h-screen dark:bg-gray-950 pt-[10vh]">
       <Navbar />
@@ -215,9 +264,21 @@ const Details = () => {
                 className="bg-[#E6E9F2] dark:bg-gray-800 h-90 rounded-2xl overflow-hidden w-full flex justify-center items-center relative"
               >
                 <img
-                  src={selectedImage}
+                  src={mainImageUrl}
                   alt={product.title}
-                  className="h-80 object-contain"
+                  className={`h-full w-full object-contain p-2 transition-all duration-300 ease-out ${
+                    mainImageLoading
+                      ? "blur-xs scale-95 opacity-80"
+                      : "blur-0 scale-100 opacity-100"
+                  }`}
+                  loading="lazy"
+                  onLoad={() => {
+                    if (selectedImage && mainImageUrl !== selectedImage) {
+                      setMainImageUrl(selectedImage);
+                    } else {
+                      setMainImageLoading(false);
+                    }
+                  }}
                 />
                 <button
                   disabled={toggleLoading}
@@ -225,7 +286,7 @@ const Details = () => {
                   onClick={handleToggleWish}
                 >
                   {toggleLoading ? (
-                    <div className="w-5 h-5 rounded-full border border-primary border-b-transparent animate-spin"></div>
+                    <Loader className="text-primary animate-spin" />
                   ) : user && saved ? (
                     <Heart className="text-red-500" fill="currentColor" />
                   ) : (
@@ -277,11 +338,7 @@ const Details = () => {
                       key={item.url}
                       onClick={() => setSelectedImage(item.url)}
                     >
-                      <img
-                        src={item.url}
-                        alt=""
-                        className="h-20 md:h-24 w-8/10 mx-auto object-contain"
-                      />
+                      <ThumbnailImage url={item.url} />
                     </SwiperSlide>
                   ))}
                 </Swiper>
@@ -417,65 +474,61 @@ const Details = () => {
           )}
 
           {isLoading ? (
-            <div className="flex space-x-3 items-center mt-5">
-              <Skeleton
-                variant="circular"
-                animation="wave"
-                className="w-8! h-8! dark:bg-gray-800/50!"
-              />
-              <Skeleton
-                variant="rounded"
-                animation="wave"
-                className="w-10! h-8! rounded-md! dark:bg-gray-800/50!"
-              />
-              <Skeleton
-                variant="circular"
-                animation="wave"
-                className="w-8! h-8! dark:bg-gray-800/50!"
-              />
-            </div>
+            <Skeleton
+              variant="rectangular"
+              className="h-8! w-30! rounded-lg! mt-5! dark:bg-gray-800/50!"
+            />
           ) : (
             product && (
-              <div className="flex space-x-4 items-center mt-5">
+              <div className="flex items-center rounded-xl border border-slate-200 dark:border-gray-600 overflow-hidden mt-3 self-start">
                 <button
-                  className="w-8 h-8 rounded-full bg-red-300 text-red-500 flex justify-center items-center text-2xl"
-                  disabled={isLoading}
+                  className="w-9 h-9 flex items-center justify-center text-slate-600 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
+                  disabled={isLoading || quantity === "1"}
                   onClick={async () => {
-                    if (Number(quantity) !== 1) {
-                      setQuantity((prev) => String(Number(prev) - 1));
+                    if (quantity !== "1") {
+                      setQuantity((prev) => (Number(prev) - 1).toString());
                     }
                   }}
                 >
-                  -
+                  <Minus size={14} />
                 </button>
 
-                <input
-                  type="text"
-                  className="w-8 h-8 text-center border border-slate-200 dark:border-gray-500 dark:text-white rounded-md focus:ring-2 focus:ring-primary transition-all duration-300"
-                  value={quantity}
-                  onChange={(e) => {
-                    const value = Number(e.target.value);
-                    if (isNaN(value)) {
-                      e.preventDefault();
-                    } else {
-                      setQuantity(e.target.value);
-                    }
-                  }}
-                  onBlur={async () => {
-                    const value = Number(quantity);
-                    if (value === 0 || isNaN(value)) {
-                      setQuantity("1");
-                    }
-                  }}
-                />
+                {isLoading ? (
+                  <div className="w-9 h-9 flex items-center justify-center">
+                    <div className="w-4 h-4 border-2 border-primary border-b-transparent rounded-full animate-spin" />
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    className="w-10 h-9 text-center text-sm font-medium text-slate-700 dark:text-white bg-transparent focus:outline-none focus:ring-1 focus:ring-inset focus:ring-primary transition-all"
+                    value={quantity}
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
+
+                      if (isNaN(value)) {
+                        e.preventDefault();
+                      } else {
+                        setQuantity(e.target.value);
+                      }
+                    }}
+                    onBlur={async (e) => {
+                      const value = Number(e.target.value);
+                      if (value === 0) {
+                        setQuantity(quantity.toString());
+                      } else {
+                      }
+                    }}
+                  />
+                )}
+
                 <button
-                  className="w-8 h-8 rounded-full bg-emerald-200 text-emerald-500 flex justify-center items-center text-2xl"
+                  className="w-9 h-9 flex items-center justify-center text-slate-600 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
                   disabled={isLoading}
                   onClick={async () => {
                     setQuantity((prev) => String(Number(prev) + 1));
                   }}
                 >
-                  +
+                  <Plus size={14} />
                 </button>
               </div>
             )
@@ -491,14 +544,17 @@ const Details = () => {
             product && (
               <button
                 disabled={addToCartLoading || updateCartLoading}
-                className="bg-primary dark:bg-white dark:text-primary text-white py-3 rounded-lg flex justify-center items-center mt-5 font-medium px-6 w-fit cursor-pointer hover:opacity-90 transition-opacity"
+                className={`bg-primary dark:bg-white dark:text-primary text-white py-3 rounded-lg flex justify-center items-center gap-x-2 mt-5 font-medium px-6 w-fit cursor-pointer ${addToCartLoading || updateCartLoading ? "opacity-60" : ""} transition-all active:scale-95`}
                 onClick={handleAddToCart}
               >
                 {addToCartLoading || updateCartLoading ? (
-                  <Loader className="animate-spin" />
+                  <>
+                    <Loader className="animate-spin text-sm" />
+                    <span className="text-sm">Adding to Cart...</span>
+                  </>
                 ) : (
                   <div className="flex items-center space-x-2">
-                    <span>Add to Cart</span>
+                    <span className="text-sm">Add to Cart</span>
                     <ShoppingCart className="group-hover:scale-115 transition-all duration-300" />
                   </div>
                 )}

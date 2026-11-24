@@ -83,3 +83,10 @@ select {
 .MuiRating-iconEmpty {
   color: gray !important;
 }
+
+
+.swiper-pagination {
+  position: relative !important;
+  bottom: 50px !important;
+  z-index: 100 !important
+}

@@ -25,6 +25,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-hook-form": "^7.82.0",
+    "react-hot-toast": "^2.6.1",
     "react-inner-image-zoom": "^4.0.1",
     "react-intersection-observer": "^11.0.1",
     "react-medium-image-zoom": "^5.4.9",

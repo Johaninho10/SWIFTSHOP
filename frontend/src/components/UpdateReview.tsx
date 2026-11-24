@@ -4,7 +4,7 @@ import {
   useGetReviewQuery,
   useUpdateReviewMutation,
 } from "../app/services/reviews";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { Loader, X } from "lucide-react";
 import { motion } from "motion/react";
 

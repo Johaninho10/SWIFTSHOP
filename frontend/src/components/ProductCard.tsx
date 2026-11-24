@@ -1,12 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import BasicRating from "./BasicRating";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToggleWishMutation } from "../app/services/products";
 import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { motion } from "motion/react";
 
-import { Heart } from "lucide-react";
+import { Heart, Loader } from "lucide-react";
 
 type Image = {
   url: string;
@@ -46,6 +46,26 @@ const ProductCard = (product: Product) => {
   const [saved, setSaved] = useState<boolean>(product.saved);
 
   const [toggleWish, { isLoading }] = useToggleWishMutation();
+  const [imageLoading, setImageLoading] = useState(true)
+
+  const originalUrl = product.images?.[0]?.url || "";
+
+  // Cloudinary blur transformation for low-quality image placeholder (LQIP)
+  const getBlurredUrl = (src: string) => {
+    if (!src) return "";
+    if (src.includes("e_blur")) return src;
+    return src.includes("/upload")
+      ? src.replace("/upload", "/upload/w_50,q_auto,e_blur:800")
+      : src;
+  };
+
+  
+  const [url, setUrl] = useState<string>(() => getBlurredUrl(originalUrl));
+
+  useEffect(() => {
+    setUrl(getBlurredUrl(originalUrl));
+    setImageLoading(true);
+  }, [originalUrl]);
 
   const user = useSelector((store: Store) => store.user.user);
   const navigate = useNavigate();
@@ -58,6 +78,7 @@ const ProductCard = (product: Product) => {
       const result = await toggleWish({ productId: product.id }).unwrap();
 
       if (result.success) {
+        toast.success(!saved ? "Added to wishlist" : "Removed from wishlist");
         setSaved(!saved);
       } else {
         throw new Error();
@@ -73,25 +94,41 @@ const ProductCard = (product: Product) => {
       whileInView={{ y: 0, opacity: 1 }}
       transition={{ duration: 1, ease: "easeInOut" }}
     >
-      <div className="bg-[#E6E9F2] dark:bg-gray-800 rounded-lg overflow-hidden w-full h-40 md:h-50 flex justify-center items-center group relative">
-        <Link className="" to={`/product/${product.id}`}>
+      <div className="bg-[#E6E9F2] dark:bg-gray-800 rounded-xl overflow-hidden w-full h-50 aspect-square group relative flex items-center justify-center">
+        <Link
+          className="w-full h-full p-4 sm:p-5 flex items-center justify-center"
+          to={`/product/${product.id}`}
+        >
           <img
-            src={product.images[0].url}
-            alt="product"
-            className="w-full h-35 md:h-45 object-cover group-hover:scale-110 transition-all duration-300"
+            src={url || originalUrl}
+            alt={product.title || "product"}
+            className={`w-full h-full max-h-full max-w-full object-contain transition-all duration-200 ease-out group-hover:scale-115 ${
+              imageLoading
+                ? "blur-xs scale-95 opacity-80"
+                : "blur-0 scale-100 opacity-100"
+            }`}
+            loading="lazy"
+            onLoad={() => {
+              if (originalUrl && url !== originalUrl) {
+                setUrl(originalUrl);
+              } else {
+                setImageLoading(false);
+              }
+            }}
           />
         </Link>
         <button
           disabled={isLoading}
-          className="w-11 h-11 rounded-full bg-white flex justify-center items-center absolute right-2 top-2"
+          aria-label="Add to wishlist"
+          className="w-11 h-11 rounded-full bg-white/90 backdrop-blur-xs shadow-xs hover:shadow-md hover:scale-110 active:scale-95 transition-all flex justify-center items-center absolute right-2.5 top-2.5 cursor-pointer"
           onClick={handleToggleWish}
         >
           {isLoading ? (
-            <div className="w-5 h-5 rounded-full border border-primary border-b-transparent animate-spin"></div>
+            <Loader size={20} className="text-primary animate-spin" />
           ) : user && saved ? (
-            <Heart className="text-red-500" fill="currentColor" />
+            <Heart size={20} className="text-red-500" fill="currentColor" />
           ) : (
-            <Heart />
+            <Heart size={20} className="text-slate-600" />
           )}
         </button>
       </div>

@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { useSignUpMutation } from "../app/services/auth";
 
 type Inputs = {
@@ -34,7 +34,6 @@ const SignUp = () => {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       const result = await signUp(data).unwrap();
-      console.log(result);
 
       if (result.success) {
         toast.success(result.message);
@@ -53,7 +52,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="bg-secondary dark:bg-gray-700 min-h-screen flex justify-center items-center">
+    <div className="bg-secondary dark:bg-gray-950 min-h-screen flex justify-center items-center">
       <motion.form
         onSubmit={handleSubmit(onSubmit)}
         className="w-[90%] max-w-100 mx-auto bg-white dark:bg-gray-800 py-2 pb-4 px-6 rounded-xl shadow-[0px_0px_20px_rgba(0,0,0,0.2)] dark:shadow-none"
@@ -61,11 +60,13 @@ const SignUp = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, ease: "easeInOut" }}
       >
-        <img
-          src={theme === "dark" ? "/logo-white.png" : "/logo.png"}
-          alt="logo"
-          className="w-15 mx-auto"
-        />
+        <Link to={'/'}>
+          <img
+            src={theme === "dark" ? "/logo-white.png" : "/logo.png"}
+            alt="logo"
+            className="w-10 mx-auto"
+          />
+        </Link>
         <h1 className="text-center text-slate-800 dark:text-slate-200 text-2xl font-medium">
           Create an account
         </h1>
@@ -174,9 +175,17 @@ const SignUp = () => {
           </div>
 
           <button
-            className={`${isSubmitting ? "bg-primary/80" : "bg-primary"} text-white py-2 rounded-lg flex justify-center items-center`}
+            className={`${isSubmitting ? "bg-primary/60" : "bg-primary"} text-white py-2 rounded-lg flex justify-center items-center gap-x-2`}
+            disabled={isSubmitting}
           >
-            {isSubmitting ? <Loader className="animate-spin" /> : "Sign Up"}
+            {isSubmitting ? (
+              <>
+                <Loader className="animate-spin" />
+                <span>Submiting...</span>
+              </>
+            ) : (
+              <span>Sign Up</span>
+            )}
           </button>
         </div>
         <p className="mt-2 text-end text-slate-700 dark:text-gray-300">

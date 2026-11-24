@@ -6,7 +6,7 @@ import {
   useVerifyEmailMutation,
   useResendCodeMutation,
 } from "../app/services/auth";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "lucide-react";
 

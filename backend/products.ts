@@ -1,0 +1,95 @@
+const products = [
+  {
+    _id: "6a85e6bfbbd9b4b91ddee0c9",
+    title: "iPhone 17 Pro Max",
+    description:
+      "Experience next-level performance and innovation with the iPhone 17 Pro Max. Designed for users who expect premium performance, an exceptional display, and advanced photography, it combines powerful technology with a sleek, sophisticated design. Key FeaturesPremium Pro Design: Elegant, durable construction with a refined finish. Advanced Pro Camera System: Capture stunning photos and videos with impressive detail, clarity, and versatility. Immersive Display: Enjoy a bright, responsive display with smooth visuals for streaming, gaming, browsing, and everyday use. Powerful Performance: Built to handle demanding apps, multitasking, gaming, and creative workflows with ease. Long-Lasting Battery: Stay connected and productive throughout your day. Advanced Connectivity: Enjoy fast and reliable connections wherever compatible networks are available. iOS Experience: Benefit from a smooth, intuitive interface and powerful features designed to work seamlessly across the Apple ecosystem. Perfect for: photography enthusiasts, content creators, professionals, gamers, and anyone looking for a premium smartphone experience. Upgrade to the iPhone 17 Pro Max and enjoy a powerful combination of performance, innovation, and premium design.",
+    price: 1000000,
+    brand: "Apple",
+    colors: ["#ec6a20", "#bcbcbc"],
+    categoriesIDs: ["6a672a67641ea146b361c65c"],
+    subCategoriesIDs: ["6a67970f13b0316715ac867d"],
+    createdAt: "2026-08-19T17:24:15.227Z",
+    updatedAt: "2026-08-19T17:24:15.227Z",
+  },
+  {
+    _id: "6a81be75ec8eb642d516cd83",
+    title: "Apple AirPods Pro 2nd gen",
+    description:
+      "Apple AirPods Pro (2nd Gen) with MagSafe Case (USB-C) provide excellent sound, active noise cancellation, and a comfortable fit. The USB-C case ensures quick charging, and they pair seamlessly with Apple devices for an effortless audio experience.",
+    price: 20000,
+    brand: "Apple",
+    colors: ["#ffffff", "#123abc"],
+    categoriesIDs: ["6a6ba2a76cb49f50c5e9f40b"],
+    subCategoriesIDs: [],
+    createdAt: "2026-08-16T13:43:17.303Z",
+    updatedAt: "2026-08-16T13:43:17.303Z",
+  },
+  {
+    _id: "6aef0b4008c800b5817d8a59",
+    title: "Google Pixel 10",
+    description:
+      "Discover the Google Pixel 10, a smartphone made to keep up with your day. Its refined design pairs with a bright 6.3-inch Actua display, so photos, videos and apps look crisp and vibrant. Powered by Google’s Tensor G5 chip, the Pixel 10 delivers smooth performance and supports helpful Gemini AI features, whether you’re getting answers, organizing tasks or editing photos.Capture more of every moment with the advanced triple rear camera system. It includes a 48 MP main camera for detailed everyday shots, a 13 MP ultrawide camera for broader scenes and a 10.8 MP 5× telephoto lens for distant subjects. With Super Res Zoom up to 20×, you can get closer to the action, while the 10.5 MP front camera with autofocus helps you take clear selfies and make video calls.The Pixel 10 is built for all-day use, with a battery designed to last more than 24 hours and Extreme Battery Saver for longer stretches between charges. When it’s time to recharge, fast charging gets you back up and running, while Pixelsnap Qi2 wireless charging makes compatible magnetic accessories easy to use. With 12 GB of RAM, storage options of 128 GB or 256 GB, and seven years of software and security updates, the Google Pixel 10 is a dependable choice for photography, entertainment and everyday productivity.",
+    price: 450000,
+    brand: "Google",
+    colors: ["#3f70cc", "#c1c5ca", "#f0f0c0"],
+    categoriesIDs: ["6a672a67641ea146b361c65c"],
+    subCategoriesIDs: ["6aef00d6607a58f6cd78ac3b"],
+    createdAt: "2026-11-07T11:28:00.789Z",
+    updatedAt: "2026-11-07T11:28:00.789Z",
+  },
+  {
+    _id: "6aef484fac4491799846128e",
+    title: "MacBook Pro 13",
+    description:
+      "Get the performance you need in a compact, easy-to-carry design with the Apple MacBook Pro 13-inch. Made for professionals, students and everyday users, it combines a sharp Retina display, a comfortable keyboard and the power to handle a wide range of daily tasks. Whether you’re working on documents, joining video calls, browsing the web or editing photos, the MacBook Pro is designed to make your workflow feel smooth and responsive.\r\n\r\nThe 13-inch Retina display brings text, images and video to life with crisp detail and vibrant colour. Its compact size makes it convenient to take between home, school and the office, while the slim aluminium design gives it a clean, durable feel. The Magic Keyboard offers a comfortable typing experience, and the large Force Touch trackpad makes navigation and gestures easy.\r\n\r\nDepending on the model, the MacBook Pro 13-inch is powered by Apple’s M1 or M2 chip, delivering responsive performance for multitasking, creative projects and everyday productivity. Fast SSD storage helps apps launch quickly and files load smoothly. Thunderbolt ports let you connect compatible accessories, transfer data and set up an external display. The built-in camera, microphones and speakers also make it ready for online meetings, video calls, music and streaming.\r\n\r\nWith its blend of portability, performance and a high-quality display, the MacBook Pro 13-inch is a versatile laptop for work, study and entertainment. It’s a practical option for customers looking for a dependable MacBook experience in a smaller form factor.",
+    price: 400000,
+    brand: "Apple",
+    colors: ["#cbcbcb"],
+    categoriesIDs: ["6a6b78aeb818d73126fd2800"],
+    subCategoriesIDs: ["6aef3f85ac4491799846128d"],
+    createdAt: "2026-11-07T15:48:31.129Z",
+    updatedAt: "2026-11-07T15:48:31.129Z",
+  },
+  {
+    _id: "6afd9185e4c7a3695db51380",
+    title: "Play Station 5",
+    description:
+      "Discover a more immersive way to play with the PlayStation 5. Its powerful hardware brings games to life with detailed visuals, smooth performance, and fast loading times. The built-in ultra-high-speed SSD helps you spend less time waiting and more time exploring, racing, competing, and creating.\r\n\r\nFeel closer to every moment with the DualSense wireless controller. Haptic feedback lets you experience different sensations as you play, while adaptive triggers can add varying levels of resistance to supported games. Together, these features make in-game actions feel more engaging and responsive.\r\n\r\nFrom cinematic single-player adventures to competitive multiplayer games, the PS5 offers a wide choice of experiences for every kind of player. Enjoy supported games in 4K and up to 120 frames per second when paired with a compatible display. You can also access a large library of games and entertainment apps, depending on availability in your region.\r\n\r\nWith its distinctive modern design, the PlayStation 5 makes a striking addition to your gaming setup. Choose the disc or digital edition to suit your preferences.\r\n\r\nKey features:\r\n- Fast loading with the built-in SSD\r\n- Detailed 4K visuals and up to 120 fps in supported games\r\n- Immersive DualSense controller with haptic feedback and adaptive triggers\r\n- A broad library of games, including single-player and online multiplayer titles\r\n- Disc or digital edition, depending on the model",
+    price: 450000,
+    brand: "Sony",
+    colors: ["#ffffff", "#000000"],
+    categoriesIDs: ["6a6b8eba62000099be9a69fd"],
+    subCategoriesIDs: ["6afd8e38e9f221bf6d619af2"],
+    createdAt: "2026-11-18T11:52:37.345Z",
+    updatedAt: "2026-11-18T11:52:37.345Z",
+  },
+  {
+    _id: "6afd9cbb01dcca93154f43cf",
+    title: "iPad Air 13",
+    description:
+      "Enjoy more room to work and play with the 13-inch iPad Air. Its Liquid Retina display delivers bright, detailed visuals—ideal for watching videos, reading, drawing, or working across multiple apps.\r\n\r\nPowered by the Apple M3 chip, iPad Air responds quickly to demanding apps, photo editing, and multitasking. It supports Apple Pencil Pro and Magic Keyboard, both sold separately, so you can take notes, create, or turn your tablet into a portable workspace.\r\n\r\nSlim and lightweight, it’s easy to take from home to the office or on the go. Choose the storage capacity and connectivity option that best fits your needs.\r\n\r\nKey features:\r\n- 13-inch Liquid Retina display\r\n- Apple M3 chip\r\n- Compatible with Apple Pencil Pro and Magic Keyboard\r\n- Available in Wi-Fi or Wi-Fi + Cellular models\r\n- Multiple storage options",
+    price: 540000,
+    brand: "Apple",
+    colors: ["#e4b4e9", "#c7edc9", "#e2e2e2", "#f7e8c7"],
+    categoriesIDs: ["6a6ba8af6cb49f50c5e9f40c"],
+    subCategoriesIDs: ["6afd9a386e6c5bf8bc964931"],
+    createdAt: "2026-11-18T12:40:27.720Z",
+    updatedAt: "2026-11-18T12:40:27.720Z",
+  },
+  {
+    _id: "6afdf8b39a3a5c9bd790a4c3",
+    title: "Apple Watch SE 3",
+    description:
+      "Apple Watch SE 3 — Smart features for every day\r\nBring useful features, fitness tracking, and connectivity to your wrist with Apple Watch SE 3. Its Always-On Retina display lets you check the time and see information at a glance, while the S10 chip keeps everyday apps and interactions running smoothly.\r\n\r\nKeep up with your daily movement and workouts, from walks and runs to swimming and other activities. The watch tracks your heart rate and activity, and helps you review your sleep stages and sleep score. You can also receive notifications for high or low heart rates and irregular rhythms.\r\n\r\nStay in touch throughout the day by viewing notifications, sending messages, making calls, or listening to audio from your wrist. With a GPS + Cellular model and an eligible plan, you can stay connected when your iPhone isn’t nearby.\r\n\r\nApple Watch SE 3 also includes safety features such as Fall Detection, Crash Detection, and Emergency SOS. Its water resistance rating of 50 metres makes it suitable for swimming, and the durable Ion-X glass is designed for everyday wear. Choose between 40 mm and 44 mm case sizes, and GPS or GPS + Cellular connectivity.\r\n\r\nKey features:\r\n- Always-On Retina display with durable Ion-X glass\r\n- S10 chip and 64 GB storage\r\n- Heart rate, sleep, and daily activity tracking\r\n- Workout support for running, swimming, and more\r\n- Fall Detection, Crash Detection, and Emergency SOS\r\n- Water resistant to 50 metres\r\n- Up to 18 hours of battery life with typical use\r\n- Fast charging\r\n- Available in 40 mm and 44 mm sizes, with GPS or GPS + Cellular",
+    price: 255000,
+    brand: "Apple",
+    colors: ["#e3e3e3", "#efabee", "#f2f7c3"],
+    categoriesIDs: ["6a6bb202bcda23b30f9cb98a"],
+    subCategoriesIDs: ["6afdf7529a3a5c9bd790a4c2"],
+    createdAt: "2026-11-18T19:12:51.794Z",
+    updatedAt: "2026-11-18T19:12:51.794Z",
+  },
+];
+
+export default products;

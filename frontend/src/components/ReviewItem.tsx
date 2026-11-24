@@ -1,7 +1,7 @@
 import { Loader, Pencil, Trash2 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useDeleteReviewMutation } from "../app/services/reviews";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { motion } from "motion/react";
 import BasicRating from "./BasicRating";
 import { useState } from "react";

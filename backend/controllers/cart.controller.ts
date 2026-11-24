@@ -1,8 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
 import asyncHander from "express-async-handler";
 import prisma from "../lib/prisma.js";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { User } from "../generated/prisma/client.js";
+import jwt from "jsonwebtoken";
+import type { JwtPayload } from "jsonwebtoken";
+import type { User } from "../generated/prisma/client.js";
 
 declare global {
   namespace Express {
@@ -53,7 +54,6 @@ export const addToCart = asyncHander(
     if (!product) {
       throw new Error("Product not found");
     }
-    
 
     const { token } = req.cookies;
     let user;
@@ -177,7 +177,7 @@ export const addToCart = asyncHander(
           },
         },
         quantity: true,
-        color: true
+        color: true,
       },
     });
 
@@ -207,7 +207,7 @@ export const updateCart = asyncHander(
   async (req: Request, res: Response, next: NextFunction) => {
     const { token } = req.cookies;
     const { productId, quantity, color } = req.body;
-    let user;    
+    let user;
 
     if (isNaN(quantity)) {
       throw new Error("The quantity must be a number");

@@ -14,7 +14,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../app/features/ui";
 import { useSignOutMutation } from "../app/services/auth";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { setUser } from "../app/features/user";
 import { useState } from "react";
 import { setCart } from "../app/features/cart";
@@ -26,7 +26,7 @@ type UI = {
 type User = {
   user: {
     firstname: string;
-    lastname: string
+    lastname: string;
   };
 };
 
@@ -95,20 +95,20 @@ const Navbar = () => {
   };
 
   return (
-    <header className="h-[10vh] fixed z-10 top-0 left-0 right-0 ">
-      <div className="flex justify-between items-center px-2.5 md:px-[5%] lg:px-[10%] border-b border-slate-300 dark:border-slate-500 bg-white dark:bg-gray-950 backdrop-blur-sm  transition-all duration-300">
+    <header className="h-[10vh] fixed z-10 top-0 left-0 right-0">
+      <div className="flex justify-between items-center px-2.5 h-full md:px-[5%] lg:px-[10%] border-b border-slate-300 dark:border-slate-500 bg-white dark:bg-gray-950 transition-all duration-300">
         <Link to={"/"}>
           <img
             src={theme === "dark" ? "/logo-white.png" : "/logo.png"}
             alt="logo"
-            className="w-15"
+            className="w-10"
           />
         </Link>
 
         <div className="flex items-center space-x-3">
           <button
             className="w-10 h-10 rounded-full hover:bg-primary/80 dark:hover:bg-white flex justify-center items-center text-slate-700 dark:text-white hover:text-white dark:hover:text-primary transition-all cursor-pointer"
-            onClick={() => navigate("/search?query=")}
+            onClick={() => navigate("/search")}
             title="Search"
           >
             <Search className="" />
@@ -158,7 +158,8 @@ const Navbar = () => {
                 role="button"
                 className="btn m-1 w-12 h-12 rounded-full flex justify-center items-center bg-primary text-white border-0 text-xl"
               >
-                {user.firstname[0].toUpperCase()}{user.lastname[0].toUpperCase()}
+                {user.firstname[0].toUpperCase()}
+                {user.lastname[0].toUpperCase()}
               </div>
               <ul
                 tabIndex={-1}

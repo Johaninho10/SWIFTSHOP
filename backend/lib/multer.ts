@@ -1,5 +1,6 @@
-import multer, { FileFilterCallback } from "multer";
-import { Request } from "express";
+import multer from "multer";
+import type { FileFilterCallback } from "multer";
+import type { Request } from "express";
 
 const storage = multer.diskStorage({
   filename: (req, file, cb) => {

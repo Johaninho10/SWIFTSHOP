@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { Trash2, Minus, Plus } from "lucide-react";
 import { useState } from "react";
-import { toast } from "react-toastify";
+import  toast  from "react-hot-toast";
 import { useUpdateCartMutation } from "../app/services/cart";
 import { useSelector, useDispatch } from "react-redux";
 import { setCart } from "../app/features/cart";
