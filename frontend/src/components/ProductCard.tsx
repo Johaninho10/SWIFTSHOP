@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { motion } from "motion/react";
 
-import { Heart, Loader } from "lucide-react";
+import { Heart, Loader, Loader2 } from "lucide-react";
 
 type Image = {
   url: string;
@@ -116,6 +116,7 @@ const ProductCard = (product: Product) => {
               }
             }}
           />
+          {imageLoading && <Loader2 className="animate-spin absolute top-1/2 left-1/2 -translate-1/2 w-10 text-white"/>}
         </Link>
         <button
           disabled={isLoading}

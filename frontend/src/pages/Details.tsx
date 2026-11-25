@@ -10,7 +10,15 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation, Autoplay } from "swiper/modules";
-import { Check, Heart, ShoppingCart, Loader, Minus, Plus } from "lucide-react";
+import {
+  Check,
+  Heart,
+  ShoppingCart,
+  Loader,
+  Minus,
+  Plus,
+  Loader2,
+} from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import {
@@ -83,7 +91,9 @@ const getBlurredUrl = (src?: string, width = 100) => {
 };
 
 const ThumbnailImage = ({ url }: { url: string }) => {
-  const [thumbUrl, setThumbUrl] = useState<string>(() => getBlurredUrl(url, 60));
+  const [thumbUrl, setThumbUrl] = useState<string>(() =>
+    getBlurredUrl(url, 60),
+  );
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -92,21 +102,26 @@ const ThumbnailImage = ({ url }: { url: string }) => {
   }, [url]);
 
   return (
-    <img
-      src={thumbUrl || url}
-      alt="Thumbnail"
-      className={`h-20 md:h-24 w-8/10 mx-auto object-contain transition-all duration-300 ${
-        loading ? "blur-xs scale-95 opacity-80" : "blur-0 scale-100 opacity-100"
-      }`}
-      loading="lazy"
-      onLoad={() => {
-        if (url && thumbUrl !== url) {
-          setThumbUrl(url);
-        } else {
-          setLoading(false);
-        }
-      }}
-    />
+    <div className="relative">
+      <img
+        src={thumbUrl || url}
+        alt="Thumbnail"
+        className={`h-20 md:h-24 w-8/10 mx-auto object-contain transition-all duration-300 ${
+          loading
+            ? "blur-xs scale-95 opacity-80"
+            : "blur-0 scale-100 opacity-100"
+        }`}
+        loading="lazy"
+        onLoad={() => {
+          if (url && thumbUrl !== url) {
+            setThumbUrl(url);
+          } else {
+            setLoading(false);
+          }
+        }}
+      />
+      {loading && <Loader2 className="text-white w-10 animate-spin absolute top-1/2 left-1/2 -translate-1/2"/>}
+    </div>
   );
 };
 
@@ -129,7 +144,9 @@ const Details = () => {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>();
-  const [mainImageUrl, setMainImageUrl] = useState<string | undefined>(undefined);
+  const [mainImageUrl, setMainImageUrl] = useState<string | undefined>(
+    undefined,
+  );
   const [mainImageLoading, setMainImageLoading] = useState<boolean>(true);
   const [selectedColor, setSelectedColor] = useState<string>();
   const [saved, setSaved] = useState(false);
@@ -237,8 +254,6 @@ const Details = () => {
     }
   }, [data, isLoading]);
 
-
-
   return (
     <div className="min-h-screen dark:bg-gray-950 pt-[10vh]">
       <Navbar />
@@ -280,6 +295,7 @@ const Details = () => {
                     }
                   }}
                 />
+
                 <button
                   disabled={toggleLoading}
                   className="w-11 h-11 rounded-full bg-white flex justify-center items-center absolute right-3 top-3 shadow-sm hover:scale-105 transition-transform"
@@ -293,6 +309,10 @@ const Details = () => {
                     <Heart className="text-slate-600" />
                   )}
                 </button>
+
+                {mainImageLoading && (
+                  <Loader2 className="absolute top-1/2 left-1/2 -translate-1/2 animate-spin w-10 text-white" />
+                )}
               </motion.div>
             )
           )}

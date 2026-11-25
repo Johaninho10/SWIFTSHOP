@@ -110,7 +110,7 @@ const PopularCategories = () => {
                   {/* Category Image centered with smooth hover zoom */}
                   <div className="absolute inset-0 p-4 sm:p-5 flex items-center justify-center">
                     <img
-                      src={category.image}
+                      src={category.image.replace("/upload", "/upload/w_75,q_auto")}
                       alt={category.name}
                       className="w-full h-full max-h-[75%] object-contain group-hover:scale-110 transition-transform duration-500 ease-out"
                       loading="lazy"
